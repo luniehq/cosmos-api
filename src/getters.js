@@ -8,7 +8,7 @@ export default function Getters(cosmosRESTURL) {
     url: cosmosRESTURL,
 
     // meta
-    lcdConnected: function () {
+    connected: function () {
       return this.nodeVersion().then(() => true, () => false)
     },
 
