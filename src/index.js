@@ -1,7 +1,7 @@
 import _Getters from "./getters"
 import send from "./send"
 import simulate from "./simulate"
-import MessageConstructors from "./messages"
+import * as MessageConstructors from "./messages"
 
 /*
 * Sender object to build and send transactions
@@ -16,15 +16,10 @@ import MessageConstructors from "./messages"
 */
 
 export default class Cosmos {
-  constructor(cosmosRESTURL, senderAddress) {
+  constructor(cosmosRESTURL) {
     this.url = cosmosRESTURL
     this.get = {}
-    this.senderAddress = senderAddress
-
-    if (!senderAddress) {
-      throw Error("If you want to use this tool just for getting data, please initialize it via `const api = Cosmos.API; const validators = api.validators();`");
-    }
-
+    this.accounts = {} // storing sequence numbers to not send two transactions with the same sequence number
 
     const getter = _Getters(cosmosRESTURL)
     Object.values(getter).forEach(getterFn => {
@@ -35,12 +30,13 @@ export default class Cosmos {
     Object.values(MessageConstructors)
       .filter(messageConstructor => messageConstructor.name !== `default`)
       .forEach(messageConstructor => {
-        this[messageConstructor.name] = function (...args) {
-          const message = messageConstructor(this.senderAddress, args)
+        this[messageConstructor.name] = function (senderAddress, args) {
+          const message = messageConstructor(senderAddress, args)
 
           return {
-            simulate: (memo = undefined) => this.simulate({ message, memo }),
-            send: ({ gas, gasPrice, memo = undefined }, signer) => this.send({ gas, gasPrice, memo }, message, signer)
+            message,
+            simulate: ({ memo = undefined }) => this.simulate(senderAddress, { message, memo }),
+            send: ({ gas, gasPrice, memo = undefined }, signer) => this.send(senderAddress, { gas, gasPrice, memo }, message, signer)
           }
         }
       })
@@ -53,31 +49,36 @@ export default class Cosmos {
       return
     }
     this.chainId = chainId
+
+    return chainId
   }
 
-  async getAccount() {
+  async getAccount(senderAddress) {
     const { sequence, account_number } = await this.get.account(senderAddress)
-    // prevent setting the sequence to a sequence number that maybe doesn't include a tx we already sent but wasn't included in a block yet
-    if (sequence > this.sequence) {
-      this.sequence = sequence
+    this.accounts[senderAddress] = {
+      // prevent downgrading a sequence number as we assume we send a transaction that hasn't affected the remote sequence number yet
+      sequence: this.accounts[senderAddress] && sequence < this.accounts[senderAddress].sequence
+        ? this.accounts[senderAddress].sequence
+        : sequence,
+      accountNumber: account_number
     }
-    this.accountNumber = account_number
+
+    return this.accounts[senderAddress]
   }
 
   /*
   * message: object
   * signer: async (signMessage: string) => { signature: Buffer, publicKey: Buffer }
   */
-  async send({ gas, gasPrice, memo }, message, signer) {
-    await this.setChainId()
-    await this.getAccount()
+  async send(senderAddress, { gas, gasPrice, memo }, message, signer) {
+    const chainId = await this.setChainId()
+    const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
     const {
       hash,
-      sequence,
       included
-    } = await send({ gas, gasPrice, memo }, message, signer, this.senderAddress, this.url, this.chainId, this.accountNumber, this.sequence)
-    this.sequence = this.sequence + 1
+    } = await send({ gas, gasPrice, memo }, message, signer, this.url, chainId, accountNumber, sequence)
+    this.accounts[senderAddress].sequence += 1
 
     return {
       hash,
@@ -86,11 +87,10 @@ export default class Cosmos {
     }
   }
 
-  async simulate({ msg, memo = undefined }) {
-    await this.setChainId()
+  async simulate(senderAddress, { message, memo = undefined }) {
+    const chainId = await this.setChainId()
+    const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
-    return simulate(this.url, this.senderAddress, this.chainId, msg, memo)
+    return simulate(this.url, senderAddress, chainId, message, memo, sequence, accountNumber)
   }
 }
-
-export const API = _Getters

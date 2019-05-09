@@ -3,16 +3,14 @@ import { createSignMessage, createSignature } from "./signature"
 
 const DEFAULT_GAS_PRICE = (2.5e-8).toFixed(9)
 
-export default async function send({ gas, gasPrice = DEFAULT_GAS_PRICE, memo = `` }, msg, senderAddress, signer, cosmosRESTURL, chainId, getters) {
-  const { sequence, account_number } = await getters.account(senderAddress)
-
+export default async function send({ gas, gasPrice = DEFAULT_GAS_PRICE, memo = `` }, msg, signer, cosmosRESTURL, chainId, accountNumber, sequence) {
   // sign transaction
   const stdTx = createStdTx({ gas, gasPrice, memo }, msg)
-  const signMessage = createSignMessage(stdTx, { sequence, account_number, chain_id: chainId })
+  const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId })
   const { signature, publicKey } = await signer(signMessage)
 
   // broadcast transaction with signatures included
-  const signatureObject = createSignature(signature, sequence, account_number, publicKey)
+  const signatureObject = createSignature(signature, sequence, accountNumber, publicKey)
   const signedTx = createSignedTransaction(stdTx, signatureObject)
   const body = createBroadcastBody(signedTx, `sync`)
   const res = await fetch(`${cosmosRESTURL}/txs`, { method: `POST`, body })

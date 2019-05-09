@@ -12,7 +12,7 @@ type StdSignMsg struct {
 */
 export function createSignMessage(
   jsonTx,
-  { sequence, account_number, chain_id }
+  { sequence, accountNumber, chainId }
 ) {
   // sign bytes need amount to be an array
   const fee = {
@@ -26,8 +26,8 @@ export function createSignMessage(
       memo: jsonTx.memo,
       msgs: jsonTx.msg, // weird msg vs. msgs
       sequence,
-      account_number,
-      chain_id
+      account_number: accountNumber,
+      chain_id: chainId
     })
   )
 }
@@ -51,7 +51,7 @@ export function createSignature(
 
 export function removeEmptyProperties(jsonTx) {
   if (Array.isArray(jsonTx)) {
-    return jsonTx.map(prepareSignBytes)
+    return jsonTx.map(removeEmptyProperties)
   }
 
   // string or number
@@ -65,7 +65,7 @@ export function removeEmptyProperties(jsonTx) {
     .forEach(key => {
       if (jsonTx[key] === undefined || jsonTx[key] === null) return
 
-      sorted[key] = prepareSignBytes(jsonTx[key])
+      sorted[key] = removeEmptyProperties(jsonTx[key])
     })
   return sorted
 }
