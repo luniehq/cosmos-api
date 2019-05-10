@@ -16,10 +16,11 @@ import * as MessageConstructors from "./messages"
 */
 
 export default class Cosmos {
-  constructor(cosmosRESTURL) {
+  constructor(cosmosRESTURL, chainId = undefined) {
     this.url = cosmosRESTURL
     this.get = {}
     this.accounts = {} // storing sequence numbers to not send two transactions with the same sequence number
+    this.chainId = chainId
 
     const getter = _Getters(cosmosRESTURL)
     Object.values(getter).forEach(getterFn => {
@@ -36,7 +37,7 @@ export default class Cosmos {
           return {
             message,
             simulate: ({ memo = undefined }) => this.simulate(senderAddress, { message, memo }),
-            send: ({ gas, gasPrice, memo = undefined }, signer) => this.send(senderAddress, { gas, gasPrice, memo }, message, signer)
+            send: ({ gas, gasPrices, memo = undefined }, signer) => this.send(senderAddress, { gas, gasPrices, memo }, message, signer)
           }
         }
       })
@@ -70,14 +71,14 @@ export default class Cosmos {
   * message: object
   * signer: async (signMessage: string) => { signature: Buffer, publicKey: Buffer }
   */
-  async send(senderAddress, { gas, gasPrice, memo }, message, signer) {
+  async send(senderAddress, { gas, gasPrices, memo }, message, signer) {
     const chainId = await this.setChainId()
     const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
     const {
       hash,
       included
-    } = await send({ gas, gasPrice, memo }, message, signer, this.url, chainId, accountNumber, sequence)
+    } = await send({ gas, gasPrices, memo }, message, signer, this.url, chainId, accountNumber, sequence)
     this.accounts[senderAddress].sequence += 1
 
     return {

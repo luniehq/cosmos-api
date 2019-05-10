@@ -1,11 +1,11 @@
 import { getErrorMessage } from "scripts/sdk-errors"
 import { createSignMessage, createSignature } from "./signature"
 
-const DEFAULT_GAS_PRICE = (2.5e-8).toFixed(9)
+const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: `uatom` }]
 
-export default async function send({ gas, gasPrice = DEFAULT_GAS_PRICE, memo = `` }, msg, signer, cosmosRESTURL, chainId, accountNumber, sequence) {
+export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = `` }, msg, signer, cosmosRESTURL, chainId, accountNumber, sequence) {
   // sign transaction
-  const stdTx = createStdTx({ gas, gasPrice, memo }, msg)
+  const stdTx = createStdTx({ gas, gasPrices, memo }, msg)
   const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId })
   const { signature, publicKey } = await signer(signMessage)
 
@@ -52,11 +52,13 @@ export async function queryTxInclusion(txHash, getters, iterations = 30, timeout
   }
 }
 // attaches the request meta data to the message
-function createStdTx({ gas, gasPrice, memo }, msg) {
+function createStdTx({ gas, gasPrices, memo }, msg) {
+  const fees = gasPrices.map(({ amount, denom }) => ({ amount: amount * gas, denom }))
+    .filter(({ amount }) => amount > 0)
   return {
     msg,
     fee: {
-      amount: [{ amount: gasPrice.amount * gas, denom: gasPrice.denom }],
+      amount: fees.length > 0 ? fees : null,
       gas
     },
     signatures: null,
