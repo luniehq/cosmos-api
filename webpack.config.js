@@ -2,7 +2,10 @@ const config = {
   entry: ['./src/index.js'],
   output: {
     path: __dirname + '/lib',
-    filename: 'cosmos.js'
+    filename: 'cosmos.js',
+    library: 'cosmos-js',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
   },
   module: {
     rules: [
