@@ -1,9 +1,21 @@
 "use strict"
 
+const RETRIES = 4
+
 export default function Getters(cosmosRESTURL) {
-  function get(path) {
-    return fetch(cosmosRESTURL + path).then(res => res.json())
+  // request and retry
+  function get(path, tries = RETRIES) {
+    while (tries) {
+      try {
+        return fetch(cosmosRESTURL + path).then(res => res.json())
+      } catch (err) {
+        if (--tries == 0) {
+          throw err
+        }
+      }
+    }
   }
+
   return {
     url: cosmosRESTURL,
 
