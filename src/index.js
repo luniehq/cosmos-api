@@ -22,9 +22,9 @@ export default class Cosmos {
     this.accounts = {} // storing sequence numbers to not send two transactions with the same sequence number
     this.chainId = chainId
 
-    const getter = _Getters(cosmosRESTURL)
-    Object.values(getter).forEach(getterFn => {
-      this.get[getterFn.name] = getterFn
+    const getters = _Getters(cosmosRESTURL)
+    Object.keys(getters).forEach(getter => {
+      this.get[getter] = getters[getter]
     })
 
     // add message constructors to the Sender to provide a simple API
