@@ -68,6 +68,14 @@ export default function Getters(cosmosRESTURL) {
     },
     txs: function (addr) {
       return Promise.all([
+        this.bankTxs(addr),
+        this.governanceTxs(addr),
+        this.distributionTxs(addr),
+        this.stakingTxs(addr)
+      ]).then((txs) => [].concat(...txs))
+    },
+    bankTxs: function (addr) {
+      return Promise.all([
         get(`/txs?sender=${addr}`),
         get(`/txs?recipient=${addr}`)
       ]).then(([senderTxs, recipientTxs]) => [].concat(senderTxs, recipientTxs))
