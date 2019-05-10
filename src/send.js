@@ -14,31 +14,23 @@ export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = 
   const signedTx = createSignedTransaction(stdTx, signatureObject)
   const body = createBroadcastBody(signedTx, `sync`)
   const res = await fetch(`${cosmosRESTURL}/txs`, { method: `POST`, body })
-    .then(res => res.json)
+    .then(res => res.json())
+    .then(assertOk)
     .catch(handleSDKError)
-
-  // check response code
-  assertOk(res)
-
-  // Sometimes we get back failed transactions, which shows only by them having a `code` property
-  if (res.code) {
-    // TODO get message from SDK: https://github.com/cosmos/cosmos-sdk/issues/4013
-    throw new Error(`Error sending: ${getErrorMessage(Number(res.code))}`)
-  }
 
   return {
     hash: res.txhash,
     sequence,
-    included: () => queryTxInclusion(res.txhash, getters)
+    included: () => queryTxInclusion(res.txhash, cosmosRESTURL)
   }
 }
 
 // wait for inclusion of a tx in a block
-// Default waiting time: 30 * 2s = 60s
-export async function queryTxInclusion(txHash, getters, iterations = 30, timeout = 2000) {
+// Default waiting time: 60 * 3s = 180s
+export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, timeout = 3000) {
   while (iterations-- > 0) {
     try {
-      await getters.tx(txHash)
+      await fetch(`${cosmosRESTURL}/txs/${txHash}`)
       break
     } catch (err) {
       // tx wasn't included in a block yet
@@ -56,7 +48,7 @@ function createStdTx({ gas, gasPrices, memo }, msg) {
   const fees = gasPrices.map(({ amount, denom }) => ({ amount: amount * gas, denom }))
     .filter(({ amount }) => amount > 0)
   return {
-    msg,
+    msg: [msg],
     fee: {
       amount: fees.length > 0 ? fees : null,
       gas
@@ -85,6 +77,7 @@ function createSignedTransaction(tx, signature) {
 // beautify the errors returned from the SDK
 function handleSDKError(err) {
   let message
+
   // TODO: get rid of this logic once the appended message is actually included inside the object message
   if (!err.message) {
     const idxColon = err.indexOf(`:`)
@@ -106,11 +99,19 @@ function assertOk(res) {
   if (Array.isArray(res)) {
     if (res.length === 0) throw new Error(`Error sending transaction`)
 
-    return res.forEach(assertOk)
+    res.forEach(assertOk)
+  }
+
+  // Sometimes we get back failed transactions, which shows only by them having a `code` property
+  if (res.code) {
+    // TODO get message from SDK: https://github.com/cosmos/cosmos-sdk/issues/4013
+    throw new Error(getErrorMessage(Number(res.code)))
   }
 
   if (!res.txhash) {
     const message = res.message
     throw new Error(message)
   }
+
+  return res
 }
