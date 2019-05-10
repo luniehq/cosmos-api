@@ -2,9 +2,10 @@
   "name": "@lunie/cosmos-js",
   "version": "0.0.4",
   "description": "Wrapper around getting and sending transactions from and to applications build on top of the Cosmos SDK",
-  "main": "src/index.js",
+  "main": "lib/cosmos.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "webpack"
   },
   "keywords": [
     "cosmos",
@@ -16,5 +17,11 @@
   "dependencies": {
     "jest": "^24.7.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-loader": "^8.0.5",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  }
 }
