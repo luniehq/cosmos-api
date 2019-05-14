@@ -1,4 +1,5 @@
 const config = {
+  devtool: "cheap-source-map",
   entry: ['./src/index.js'],
   output: {
     path: __dirname + '/lib',

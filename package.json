@@ -1,11 +1,12 @@
 {
   "name": "@lunie/cosmos-js",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Wrapper around getting and sending transactions from and to applications build on top of the Cosmos SDK",
   "main": "lib/cosmos.js",
   "scripts": {
     "test": "jest",
-    "prepublishOnly": "webpack"
+    "build": "webpack",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "cosmos",
