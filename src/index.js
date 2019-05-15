@@ -41,6 +41,15 @@ export default class Cosmos {
           }
         }
       })
+
+    this.MultiMessage = function (senderAddress, messageObjects) {
+      const messages = messageObjects.map(({ message }) => message)
+      return {
+        messages,
+        simulate: ({ memo = undefined }) => this.simulate(senderAddress, { message: messages[0], memo }), // TODO include actual mutli message simulation
+        send: ({ gas, gasPrices, memo = undefined }, signer) => this.send(senderAddress, { gas, gasPrices, memo }, messages, signer)
+      }
+    }
   }
 
   async setChainId(chainId = this.chainId) {
@@ -71,14 +80,14 @@ export default class Cosmos {
   * message: object
   * signer: async (signMessage: string) => { signature: Buffer, publicKey: Buffer }
   */
-  async send(senderAddress, { gas, gasPrices, memo }, message, signer) {
+  async send(senderAddress, { gas, gasPrices, memo }, messages, signer) {
     const chainId = await this.setChainId()
     const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
     const {
       hash,
       included
-    } = await send({ gas, gasPrices, memo }, message, signer, this.url, chainId, accountNumber, sequence)
+    } = await send({ gas, gasPrices, memo }, messages, signer, this.url, chainId, accountNumber, sequence)
     this.accounts[senderAddress].sequence += 1
 
     return {

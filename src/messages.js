@@ -28,8 +28,9 @@ export function MsgDelegate(
   return {
     type: `cosmos-sdk/MsgDelegate`,
     value: {
+      delegator_address: senderAddress,
       validator_address,
-      value: Coin({ amount, denom })
+      amount: Coin({ amount, denom })
     }
   }
 }
@@ -129,16 +130,16 @@ export function MsgDeposit(
 export function MsgWithdrawDelegationReward(
   senderAddress,
   {
-    validatorAddresses
+    validatorAddress
   }
 ) {
-  return validatorAddresses.map(validatorAddress => ({
+  return {
     type: `cosmos-sdk/MsgWithdrawDelegationReward`,
     value: {
       delegator_address: senderAddress,
       validator_address: validatorAddress
     }
-  }))
+  }
 }
 
 function Coin({ amount, denom }) {

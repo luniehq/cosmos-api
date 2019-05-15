@@ -1,5 +1,3 @@
-const GAS_ADJUSTMENT = 2.5
-
 export default async function simulate(
   cosmosRESTURL,
   senderAddress,
@@ -25,8 +23,7 @@ export default async function simulate(
   const tx = createRESTPOSTObject(senderAddress, chainId, { sequence, accountNumber, memo }, msg)
 
   const { gas_estimate } = await fetch(url, { method: `POST`, body: JSON.stringify(tx) }).then(res => res.json())
-  const gas = gas_estimate < 7000 ? 7000 : gas_estimate
-  return Math.round(gas * GAS_ADJUSTMENT)
+  return gas_estimate
 }
 
 // attaches the request meta data to the message
@@ -40,5 +37,5 @@ function createRESTPOSTObject(senderAddress, chainId, { sequence, accountNumber,
     memo
   }
 
-  return { base_req: requestMetaData, ...msg }
+  return { base_req: requestMetaData, ...msg.value }
 }
