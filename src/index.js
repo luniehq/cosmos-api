@@ -28,10 +28,9 @@ export default class Cosmos {
     })
 
     // add message constructors to the Sender to provide a simple API
-    Object.values(MessageConstructors)
-      .filter(messageConstructor => messageConstructor.name !== `default`)
-      .forEach(messageConstructor => {
-        this[messageConstructor.name] = function (senderAddress, args) {
+    Object.entries(MessageConstructors)
+      .forEach(([name, messageConstructor]) => {
+        this[name] = function (senderAddress, args) {
           const message = messageConstructor(senderAddress, args)
 
           return {
@@ -42,8 +41,9 @@ export default class Cosmos {
         }
       })
 
-    this.MultiMessage = function (senderAddress, messageObjects) {
-      const messages = messageObjects.map(({ message }) => message)
+    this.MultiMessage = function (senderAddress, ...messageObjects) {
+      const allMessageObjects = [].concat(...messageObjects)
+      const messages = allMessageObjects.map(({ message }) => message)
       return {
         messages,
         simulate: ({ memo = undefined }) => this.simulate(senderAddress, { message: messages[0], memo }), // TODO include actual mutli message simulation

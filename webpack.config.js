@@ -1,5 +1,3 @@
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
 const config = {
   devtool: "cheap-source-map",
   entry: ['./src/index.js'],
@@ -21,23 +19,6 @@ const config = {
         }
       }
     ]
-  },
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          warnings: false,
-          parse: {},
-          compress: {},
-          mangle: false,
-          output: null,
-          toplevel: false,
-          nameCache: null,
-          ie8: false,
-          keep_fnames: false,
-        },
-      }),
-    ],
-  },
+  }
 }
 module.exports = config;

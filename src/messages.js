@@ -148,3 +148,14 @@ function Coin({ amount, denom }) {
     denom
   })
 }
+
+export default {
+  "MsgSend": MsgSend,
+  "MsgDelegate": MsgDelegate,
+  "MsgUndelegate": MsgUndelegate,
+  "MsgRedelegate": MsgRedelegate,
+  "MsgSubmitProposal": MsgSubmitProposal,
+  "MsgVote": MsgVote,
+  "MsgDeposit": MsgDeposit,
+  "MsgWithdrawDelegationReward": MsgWithdrawDelegationReward
+}
