@@ -39,15 +39,16 @@ export function MsgUndelegate(
   senderAddress,
   {
     validator_address,
-    shares_amount
+    amount,
+    denom
   }
 ) {
   return {
     type: `cosmos-sdk/MsgUndelegate`,
     value: {
       validator_address,
-      shares_amount,
-      delegator_address: senderAddress
+      delegator_address: senderAddress,
+      amount: Coin({ amount, denom })
     }
   }
 }
@@ -57,15 +58,17 @@ export function MsgRedelegate(
   {
     validator_src_address,
     validator_dst_address,
-    shares_amount
+    amount,
+    denom
   }
 ) {
   return {
     type: `cosmos-sdk/MsgBeginRedelegate`,
     value: {
+      delegator_address: senderAddress,
       validator_src_address,
       validator_dst_address,
-      shares_amount
+      amount: Coin({ amount, denom })
     }
   }
 }
