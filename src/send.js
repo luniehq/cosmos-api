@@ -1,4 +1,3 @@
-import { getErrorMessage } from "./sdk-errors.js"
 import { createSignMessage, createSignature } from "./signature"
 
 const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: `uatom` }]
