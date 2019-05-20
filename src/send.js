@@ -7,10 +7,12 @@ export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = 
   // sign transaction
   const stdTx = createStdTx({ gas, gasPrices, memo }, messages)
   const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId })
-  const { signature, publicKey } = await signer(signMessage)
-    .catch(err => {
-      throw new Error("Signing failed: " + err.message)
-    })
+  let signature, publicKey
+  try {
+    ({ signature, publicKey } = await signer(signMessage))
+  } catch (err) {
+    throw new Error("Signing failed: " + err.message)
+  }
 
   // broadcast transaction with signatures included
   const signatureObject = createSignature(signature, sequence, accountNumber, publicKey)
