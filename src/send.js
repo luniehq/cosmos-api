@@ -47,7 +47,7 @@ export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, t
 }
 // attaches the request meta data to the message
 function createStdTx({ gas, gasPrices, memo }, messages) {
-  const fees = gasPrices.map(({ amount, denom }) => ({ amount: amount * gas, denom }))
+  const fees = gasPrices.map(({ amount, denom }) => ({ amount: String(Math.round(amount * gas)), denom }))
     .filter(({ amount }) => amount > 0)
   return {
     msg: Array.isArray(messages) ? messages : [messages],
