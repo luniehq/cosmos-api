@@ -34,6 +34,15 @@ export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, t
   while (iterations-- > 0) {
     try {
       await fetch(`${cosmosRESTURL}/txs/${txHash}`)
+        .then(function (response) {
+          if (response.status >= 200 && response.status < 300) {
+            return Promise.resolve(response)
+          } else {
+            var error = new Error(response.statusText || response.status)
+            error.response = response
+            return Promise.reject(error)
+          }
+        })
       break
     } catch (err) {
       // tx wasn't included in a block yet
