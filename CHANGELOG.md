@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.16] - 2019-05-21
+
+### Fixed
+
+- Fixed premature success message on tx inclusion failure @faboweb
+
 ## [0.0.15] - 2019-05-21
 
 ### Added
