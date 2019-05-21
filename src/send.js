@@ -85,6 +85,10 @@ function assertOk(res) {
     res.forEach(assertOk)
   }
 
+  if (res.error) {
+    throw new Error(res.error)
+  }
+
   // Sometimes we get back failed transactions, which shows only by them having a `code` property
   if (res.code) {
     const message = JSON.parse(res.raw_log).message
