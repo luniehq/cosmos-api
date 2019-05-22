@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.17] - 2019-05-22
+
+### Changed
+
+- Increase gas adjustment to 1.5 @faboweb
+
 ## [0.0.16] - 2019-05-21
 
 ### Fixed
