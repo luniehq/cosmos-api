@@ -33,7 +33,7 @@ export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = 
 export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, timeout = 3000) {
   while (iterations-- > 0) {
     try {
-      await fetch(`${cosmosRESTURL}/txs/${txHash}`)
+      const res = await fetch(`${cosmosRESTURL}/txs/${txHash}`)
         .then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             return Promise.resolve(response)
@@ -54,6 +54,8 @@ export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, t
   if (iterations <= 0) {
     throw new Error(`The transaction was still not included in a block. We can't say for certain it will be included in the future.`)
   }
+
+  assertOk(res)
 }
 // attaches the request meta data to the message
 function createStdTx({ gas, gasPrices, memo }, messages) {
