@@ -1,4 +1,4 @@
-const GAS_ADJUSTMENT = 1.2
+const GAS_ADJUSTMENT = 1.5
 
 export default async function simulate(
   cosmosRESTURL,
