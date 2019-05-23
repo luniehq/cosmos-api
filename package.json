@@ -8,7 +8,7 @@
     "build": "webpack",
     "prepublishOnly": "npm run build",
     "log": "simsala log",
-    "release": "simsala release"
+    "release": "git checkout develop & git pull & git push origin develop:release"
   },
   "keywords": [
     "cosmos",
