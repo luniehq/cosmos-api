@@ -135,7 +135,13 @@ export default function Getters(cosmosRESTURL) {
       return get(`/staking/delegators/${delegatorAddr}/validators`)
     },
     // Get a list containing all the validator candidates
-    validators: () => get(`/staking/validators`),
+    validators: () => Promise.all([
+      get(`/staking/validators?status=unbonding`),
+      get(`/staking/validators?status=bonded`),
+      get(`/staking/validators?status=unbonded`)
+    ]).then((validatorGroups) =>
+      [].concat(...validatorGroups)
+    ),
     // Get information from a validator
     validator: function (addr) {
       return get(`/staking/validators/${addr}`)
