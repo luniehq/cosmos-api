@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.21] - 2019-05-24
+
+### Fixed
+
+- Fixed not all validators being loaded @faboweb
+
 ## [0.0.20] - 2019-05-23
 
 ### Fixed
