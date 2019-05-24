@@ -49,7 +49,7 @@ const ledgerSigner = async (signMessage) => {
 }
 
 // send the transaction
-const { included }= await msg.send({ gas: 200000 }, localSigner)
+const { included }= await msg.send({ gas: 200000 }, ledgerSigner)
 
 // await tx to be included in a block
 await included()
