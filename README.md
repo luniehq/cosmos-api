@@ -1,5 +1,5 @@
 # Cosmos API
-## Library for interacting with applications built on the Cosmos SDK
+Cosmos API is a library for interacting with applications built on the Cosmos SDK.
 
 ## Install
 
