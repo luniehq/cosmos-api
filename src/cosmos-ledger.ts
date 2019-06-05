@@ -1,11 +1,21 @@
-import { App, comm_u2f } from "ledger-cosmos-js"
-import { getCosmosAddress } from "@lunie/js-cosmos-wallet/src/js-cosmos-wallet"
-import { signatureImport } from "secp256k1"
-const semver = require("semver")
+import App from 'ledger-cosmos-js'
+import { getCosmosAddress } from '@lunie/cosmos-keys'
+import { signatureImport } from 'secp256k1'
+import TransportU2F from '@ledgerhq/hw-transport-u2f'
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
+import TransportWebBLE from '@ledgerhq/hw-transport-web-ble'
+const semver = require('semver')
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
-const REQUIRED_COSMOS_APP_VERSION = "1.5.0"
+const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
 //const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
+
+declare global {
+  interface Window {
+    chrome: any
+    opr: any
+  }
+}
 
 /*
 HD wallet derivation path (BIP44)
@@ -37,7 +47,7 @@ export default class Ledger {
     // check if the device is connected or on screensaver mode
     const response = await this.cosmosApp.publicKey(HDPATH)
     this.checkLedgerErrors(response, {
-      timeoutMessag: "Could not find a connected and unlocked Ledger device"
+      timeoutMessag: 'Could not find a connected and unlocked Ledger device'
     })
   }
 
@@ -62,8 +72,16 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    const communicationMethod = await comm_u2f.create_async(timeout, false)
-    const cosmosLedgerApp = new App(communicationMethod)
+    const browser = getBrowser()
+
+    let transport
+    if (browser === 'chrome') {
+      transport = await TransportWebUSB.create(timeout * 1000)
+    } else {
+      transport = await TransportU2F.create(timeout * 1000)
+    }
+
+    const cosmosLedgerApp = new App(transport)
 
     this.cosmosApp = cosmosLedgerApp
 
@@ -77,7 +95,7 @@ export default class Ledger {
   async getCosmosAppVersion() {
     await this.connect()
 
-    const response = await this.cosmosApp.get_version()
+    const response = await this.cosmosApp.getVersion()
     this.checkLedgerErrors(response)
     const { major, minor, patch, test_mode } = response
     checkAppMode(this.testModeAllowed, test_mode)
@@ -127,12 +145,9 @@ export default class Ledger {
       return
     }
 
-    const response = await this.cosmosApp.getAddressAndPubKey(
-      BECH32PREFIX,
-      HDPATH
-    )
+    const response = await this.cosmosApp.getAddressAndPubKey(BECH32PREFIX, HDPATH)
     this.checkLedgerErrors(response, {
-      rejectionMessage: "Displayed address was rejected"
+      rejectionMessage: 'Displayed address was rejected'
     })
   }
 
@@ -152,10 +167,10 @@ export default class Ledger {
   // parse Ledger errors in a more user friendly format
   /* istanbul ignore next: maps a bunch of errors */
   private checkLedgerErrors(
-    { error_message, device_locked }: { error_message: string, device_locked: Boolean },
+    { error_message, device_locked }: { error_message: string; device_locked: Boolean },
     {
-      timeoutMessag = "Connection timed out. Please try again.",
-      rejectionMessage = "User rejected the transaction"
+      timeoutMessag = 'Connection timed out. Please try again.',
+      rejectionMessage = 'User rejected the transaction'
     } = {}
   ) {
     if (device_locked) {
@@ -170,12 +185,12 @@ export default class Ledger {
         throw new Error(`Transaction rejected`)
       case `Transaction rejected`:
         throw new Error(rejectionMessage)
-      case `Unknown error code`:
+      case `Unknown Status Code: 26628`:
         throw new Error(`Ledger's screensaver mode is on`)
       case `Instruction not supported`:
         throw new Error(
           `Your Cosmos Ledger App is not up to date. ` +
-          `Please update to version ${REQUIRED_COSMOS_APP_VERSION}.`
+            `Please update to version ${REQUIRED_COSMOS_APP_VERSION}.`
         )
       case `No errors`:
         // do nothing
@@ -187,7 +202,7 @@ export default class Ledger {
 }
 
 // stiched version string from Ledger app version object
-function versionString({ major, minor, patch }: { major: Number, minor: Number, patch: Number }) {
+function versionString({ major, minor, patch }: { major: Number; minor: Number; patch: Number }) {
   return `${major}.${minor}.${patch}`
 }
 
@@ -197,5 +212,40 @@ export const checkAppMode = (testModeAllowed: Boolean, testMode: Boolean) => {
     throw new Error(
       `DANGER: The Cosmos Ledger app is in test mode and shouldn't be used on mainnet!`
     )
+  }
+}
+
+function getBrowser() {
+  // please note,
+  // that IE11 now returns undefined again for window.chrome
+  // and new Opera 30 outputs true for window.chrome
+  // but needs to check if window.opr is not undefined
+  // and new IE Edge outputs to true now for window.chrome
+  // and if not iOS Chrome check
+  // so use the below updated condition
+  // tslint:disable-next-line
+  var isChromium = window.chrome
+  var winNav = window.navigator
+  var vendorName = winNav.vendor
+  // tslint:disable-next-line
+  var isOpera = typeof window.opr !== 'undefined'
+  var isIEedge = winNav.userAgent.indexOf('Edge') > -1
+  var isIOSChrome = winNav.userAgent.match('CriOS')
+
+  if (isIOSChrome) {
+    // is Google Chrome on IOS
+    return 'chrome'
+  } else if (
+    isChromium !== null &&
+    typeof isChromium !== 'undefined' &&
+    vendorName === 'Google Inc.' &&
+    isOpera === false &&
+    isIEedge === false
+  ) {
+    // is Google Chrome
+    return 'chrome'
+  } else {
+    // not Google Chrome
+    if (isOpera) return 'opera'
   }
 }
