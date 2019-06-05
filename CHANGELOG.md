@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.3] - 2019-06-05
+
+### Repository
+
+- Simplified and unified repository (using webpack) @faboweb
+- Migrated to cosmos ledger lib v2 @faboweb
+
 ## [0.0.2] - 2019-05-24
 
 ### Added
