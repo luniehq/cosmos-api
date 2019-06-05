@@ -1,7 +1,7 @@
-import Ledger from "../src/ledger"
+import Ledger from '../src/cosmos-ledger'
 
-jest.mock("secp256k1", () => ({
-  signatureImport: () => Buffer.from("1234")
+jest.mock('secp256k1', () => ({
+  signatureImport: () => Buffer.from('1234')
 }))
 
 const config = {
@@ -14,7 +14,7 @@ describe(`Ledger`, () => {
     ledger = new Ledger(config)
   })
 
-  it("testDevice", async () => {
+  it('testDevice', async () => {
     const self = {
       connect: jest.fn()
     }
@@ -22,29 +22,29 @@ describe(`Ledger`, () => {
     expect(self.connect).toHaveBeenCalledWith(3)
   })
 
-  describe("connect", () => {
-    it("connects", async () => {
+  describe('connect', () => {
+    it('connects', async () => {
       jest.resetModules()
-      jest.doMock("ledger-cosmos-js", () => ({
+      jest.doMock('ledger-cosmos-js', () => ({
         App: class MockApp {
           publicKey() {
             return {
-              error_message: "No errors"
+              error_message: 'No errors'
             }
           }
           get_version() {
             return {
-              major: "1",
-              minor: "5",
-              patch: "0",
+              major: '1',
+              minor: '5',
+              patch: '0',
               test_mode: false,
-              error_message: "No errors"
+              error_message: 'No errors'
             }
           }
           appInfo() {
             return {
-              appName: "Cosmos",
-              error_message: "No errors"
+              appName: 'Cosmos',
+              error_message: 'No errors'
             }
           }
         },
@@ -52,12 +52,12 @@ describe(`Ledger`, () => {
           create_async: () => ({})
         }
       }))
-      const Ledger = require("../src/ledger").default
+      const Ledger = require('../src/ledger').default
       ledger = new Ledger(config)
       await ledger.connect()
     })
 
-    it("uses existing connection", async () => {
+    it('uses existing connection', async () => {
       const self = {
         isSendingData: jest.fn(),
         isReady: jest.fn(),
@@ -71,11 +71,11 @@ describe(`Ledger`, () => {
 
     it("fails if can't get data from device", async () => {
       jest.resetModules()
-      jest.doMock("ledger-cosmos-js", () => ({
+      jest.doMock('ledger-cosmos-js', () => ({
         App: class MockApp {
           publicKey() {
             return {
-              error_message: "BIG ERROR"
+              error_message: 'BIG ERROR'
             }
           }
         },
@@ -83,28 +83,28 @@ describe(`Ledger`, () => {
           create_async: () => ({})
         }
       }))
-      const Ledger = require("../src/ledger").default
+      const Ledger = require('../src/ledger').default
       ledger = new Ledger(config)
 
-      await expect(ledger.connect()).rejects.toThrow("BIG ERROR")
+      await expect(ledger.connect()).rejects.toThrow('BIG ERROR')
     })
 
-    it("fails if Cosmos App is outdated", async () => {
+    it('fails if Cosmos App is outdated', async () => {
       jest.resetModules()
-      jest.doMock("ledger-cosmos-js", () => ({
+      jest.doMock('ledger-cosmos-js', () => ({
         App: class MockApp {
           publicKey() {
             return {
-              error_message: "No errors"
+              error_message: 'No errors'
             }
           }
           get_version() {
             return {
-              major: "1",
-              minor: "0",
-              patch: "0",
+              major: '1',
+              minor: '0',
+              patch: '0',
               test_mode: false,
-              error_message: "No errors"
+              error_message: 'No errors'
             }
           }
         },
@@ -112,19 +112,21 @@ describe(`Ledger`, () => {
           create_async: () => ({})
         }
       }))
-      const Ledger = require("../src/ledger").default
+      const Ledger = require('../src/ledger').default
       ledger = new Ledger(config)
 
-      await expect(ledger.connect()).rejects.toThrow("Outdated version: Please update Ledger Cosmos App to the latest version.")
+      await expect(ledger.connect()).rejects.toThrow(
+        'Outdated version: Please update Ledger Cosmos App to the latest version.'
+      )
     })
 
-    it("fails if Ledger device is locked", async () => {
+    it('fails if Ledger device is locked', async () => {
       jest.resetModules()
-      jest.doMock("ledger-cosmos-js", () => ({
+      jest.doMock('ledger-cosmos-js', () => ({
         App: class MockApp {
           publicKey() {
             return {
-              error_message: "No errors",
+              error_message: 'No errors',
               device_locked: true
             }
           }
@@ -133,22 +135,22 @@ describe(`Ledger`, () => {
           create_async: () => ({})
         }
       }))
-      const Ledger = require("../src/ledger").default
+      const Ledger = require('../src/ledger').default
       ledger = new Ledger(config)
 
-      await expect(ledger.connect()).rejects.toThrow("")
+      await expect(ledger.connect()).rejects.toThrow('')
     })
   })
 
-  describe("getCosmosAppVersion", () => {
-    it("new version", async () => {
+  describe('getCosmosAppVersion', () => {
+    it('new version', async () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
           get_version: () => ({
-            major: "1",
-            minor: "5",
-            patch: "0",
+            major: '1',
+            minor: '5',
+            patch: '0',
             test_mode: false
           })
         },
@@ -157,38 +159,38 @@ describe(`Ledger`, () => {
       const res = await ledger.getCosmosAppVersion.call(self)
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).toHaveBeenCalled()
-      expect(res).toBe("1.5.0")
+      expect(res).toBe('1.5.0')
     })
 
-    it("old version", async () => {
+    it('old version', async () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
           get_version: () => ({
-            major: "1",
-            minor: "1",
-            patch: "0",
+            major: '1',
+            minor: '1',
+            patch: '0',
             test_mode: false,
-            error_message: "No errors"
+            error_message: 'No errors'
           })
         },
         checkLedgerErrors: jest.fn()
       }
-      expect(await ledger.getCosmosAppVersion.call(self)).toBe("1.1.0")
+      expect(await ledger.getCosmosAppVersion.call(self)).toBe('1.1.0')
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).toHaveBeenCalled()
     })
 
-    it("test mode", async () => {
+    it('test mode', async () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
           get_version: () => ({
-            major: "1",
-            minor: "5",
-            patch: "0",
+            major: '1',
+            minor: '5',
+            patch: '0',
             test_mode: true,
-            error_message: "No errors"
+            error_message: 'No errors'
           })
         },
         checkLedgerErrors: jest.fn()
@@ -199,14 +201,14 @@ describe(`Ledger`, () => {
     })
   })
 
-  describe("isCosmosAppOpen", () => {
-    it("success", async () => {
+  describe('isCosmosAppOpen', () => {
+    it('success', async () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
           appInfo: () => ({
-            appName: "Cosmos",
-            error_message: "No errors"
+            appName: 'Cosmos',
+            error_message: 'No errors'
           })
         },
         checkLedgerErrors: jest.fn()
@@ -216,13 +218,13 @@ describe(`Ledger`, () => {
       expect(self.checkLedgerErrors).toHaveBeenCalled()
     })
 
-    it("failure", async () => {
+    it('failure', async () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
           appInfo: () => ({
-            appName: "Ethereum",
-            error_message: "No errors"
+            appName: 'Ethereum',
+            error_message: 'No errors'
           })
         },
         checkLedgerErrors: jest.fn()
@@ -233,24 +235,24 @@ describe(`Ledger`, () => {
     })
   })
 
-  it("getCosmosAddress", async () => {
+  it('getCosmosAddress', async () => {
     const self = {
       connect: jest.fn(),
-      getPubKey: jest.fn(() => Buffer.from("1234"))
+      getPubKey: jest.fn(() => Buffer.from('1234'))
     }
     const res = await ledger.getCosmosAddress.call(self)
     expect(self.connect).toHaveBeenCalled()
-    expect(res).toBe("cosmos1l4aqmqyen0kawmy6pq5q27qhl3synfg8uqcsa5")
+    expect(res).toBe('cosmos1l4aqmqyen0kawmy6pq5q27qhl3synfg8uqcsa5')
   })
 
-  it("getPubKey", async () => {
+  it('getPubKey', async () => {
     const self = {
       connect: jest.fn(),
       checkLedgerErrors: jest.fn(),
       cosmosApp: {
         publicKey: () => ({
-          compressed_pk: Buffer.from("1234"),
-          error_message: "No errors"
+          compressed_pk: Buffer.from('1234'),
+          error_message: 'No errors'
         })
       }
     }
@@ -260,15 +262,15 @@ describe(`Ledger`, () => {
     expect(res instanceof Buffer).toBe(true)
   })
 
-  describe("confirmLedgerAddress", () => {
-    it("new version", async () => {
+  describe('confirmLedgerAddress', () => {
+    it('new version', async () => {
       const self = {
         checkLedgerErrors: jest.fn(),
         connect: jest.fn(),
-        getCosmosAppVersion: () => "1.5.0",
+        getCosmosAppVersion: () => '1.5.0',
         cosmosApp: {
           getAddressAndPubKey: jest.fn(() => ({
-            error_message: "No errors"
+            error_message: 'No errors'
           }))
         }
       }
@@ -278,14 +280,14 @@ describe(`Ledger`, () => {
       expect(self.cosmosApp.getAddressAndPubKey).toHaveBeenCalled()
     })
 
-    it("old version", async () => {
+    it('old version', async () => {
       const self = {
         checkLedgerErrors: jest.fn(),
         connect: jest.fn(),
-        getCosmosAppVersion: () => "1.1.0",
+        getCosmosAppVersion: () => '1.1.0',
         cosmosApp: {
           getAddressAndPubKey: jest.fn(() => ({
-            error_message: "No errors"
+            error_message: 'No errors'
           }))
         }
       }
@@ -296,25 +298,22 @@ describe(`Ledger`, () => {
     })
   })
 
-  it("sign", async () => {
+  it('sign', async () => {
     const self = {
       checkLedgerErrors: jest.fn(),
       connect: jest.fn(),
-      getCosmosAppVersion: () => "1.1.0",
+      getCosmosAppVersion: () => '1.1.0',
       cosmosApp: {
         sign: jest.fn(() => ({
-          signature: Buffer.from("1234"), // needs to be a DER signature, but the upstream library is mockeed here
-          error_message: "No errors"
+          signature: Buffer.from('1234'), // needs to be a DER signature, but the upstream library is mockeed here
+          error_message: 'No errors'
         }))
       }
     }
-    const res = await ledger.sign.call(self, "message")
+    const res = await ledger.sign.call(self, 'message')
     expect(self.connect).toHaveBeenCalled()
     expect(self.checkLedgerErrors).toHaveBeenCalled()
-    expect(self.cosmosApp.sign).toHaveBeenCalledWith(
-      expect.any(Array),
-      "message"
-    )
+    expect(self.cosmosApp.sign).toHaveBeenCalledWith(expect.any(Array), 'message')
     expect(res instanceof Buffer).toBe(true)
   })
 })
