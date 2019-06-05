@@ -3,7 +3,6 @@ import { getCosmosAddress } from '@lunie/cosmos-keys'
 import { signatureImport } from 'secp256k1'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
-import TransportWebBLE from '@ledgerhq/hw-transport-web-ble'
 const semver = require('semver')
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
