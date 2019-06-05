@@ -1,6 +1,6 @@
 {
   "name": "@lunie/cosmos-js",
-  "version": "0.0.20",
+  "version": "0.0.22",
   "description": "Wrapper around getting and sending transactions from and to applications build on top of the Cosmos SDK",
   "main": "lib/cosmos.js",
   "scripts": {
@@ -17,15 +17,16 @@
   ],
   "author": "Lunie International Software Systems Inc. <hello@lunie.io>",
   "license": "Apache-2.0",
-  "dependencies": {
-    "jest": "^24.7.1"
-  },
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "babel-loader": "^8.0.5",
+    "jest": "^24.7.1",
     "simsala": "^0.0.12",
     "webpack": "^4.31.0",
     "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
   }
 }
