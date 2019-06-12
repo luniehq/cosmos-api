@@ -2,6 +2,10 @@
 
 This library helps interfacing with Cosmos Ledger App. It provides a developer friendly interface and user friendly error messages.
 
+## THANK YOU
+
+This library is based on `ledger-cosmos-js` by Juan Leni who implemente the Cosmos Ledger App. Thank you Juan!
+
 ## Install
 
 ```bash
@@ -18,6 +22,7 @@ import Ledger from "@lunie/cosmos-ledger"
 const signMessage = ... message to sign, generate messages with "@lunie/cosmos-js"
 
 const ledger = await Ledger().connect()
+
 const signature = await ledger.sign(signMessage)
 ```
 
