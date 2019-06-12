@@ -2,7 +2,6 @@ import App from 'ledger-cosmos-js'
 import { getCosmosAddress } from '@lunie/cosmos-keys'
 import { signatureImport } from 'secp256k1'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
-import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 const semver = require('semver')
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
@@ -71,14 +70,7 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    const browser = getBrowser()
-
-    let transport
-    if (browser === 'chrome') {
-      transport = await TransportWebUSB.create(timeout * 1000)
-    } else {
-      transport = await TransportU2F.create(timeout * 1000)
-    }
+    let transport = await TransportU2F.create(timeout * 1000)
 
     const cosmosLedgerApp = new App(transport)
 
@@ -211,40 +203,5 @@ export const checkAppMode = (testModeAllowed: Boolean, testMode: Boolean) => {
     throw new Error(
       `DANGER: The Cosmos Ledger app is in test mode and shouldn't be used on mainnet!`
     )
-  }
-}
-
-function getBrowser() {
-  // please note,
-  // that IE11 now returns undefined again for window.chrome
-  // and new Opera 30 outputs true for window.chrome
-  // but needs to check if window.opr is not undefined
-  // and new IE Edge outputs to true now for window.chrome
-  // and if not iOS Chrome check
-  // so use the below updated condition
-  // tslint:disable-next-line
-  var isChromium = window.chrome
-  var winNav = window.navigator
-  var vendorName = winNav.vendor
-  // tslint:disable-next-line
-  var isOpera = typeof window.opr !== 'undefined'
-  var isIEedge = winNav.userAgent.indexOf('Edge') > -1
-  var isIOSChrome = winNav.userAgent.match('CriOS')
-
-  if (isIOSChrome) {
-    // is Google Chrome on IOS
-    return 'chrome'
-  } else if (
-    isChromium !== null &&
-    typeof isChromium !== 'undefined' &&
-    vendorName === 'Google Inc.' &&
-    isOpera === false &&
-    isIEedge === false
-  ) {
-    // is Google Chrome
-    return 'chrome'
-  } else {
-    // not Google Chrome
-    if (isOpera) return 'opera'
   }
 }
