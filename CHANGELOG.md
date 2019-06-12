@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.4] - 2019-06-12
+
+### Fixed
+
+- Removed webusb due to lack of support @faboweb
+
 ## [0.0.3] - 2019-06-05
 
 ### Repository

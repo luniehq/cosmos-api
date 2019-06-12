@@ -1,6 +1,6 @@
 {
   "name": "@lunie/cosmos-ledger",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "provide simple Ledger tooling for the Cosmos Ledger App with user friendly errors",
   "keywords": [
     "cosmos",
