@@ -136,7 +136,7 @@ export default class Ledger {
       return
     }
 
-    const response = await this.cosmosApp.getAddressAndPubKey(BECH32PREFIX, HDPATH)
+    const response = await this.cosmosApp.getAddressAndPubKey(HDPATH, BECH32PREFIX)
     this.checkLedgerErrors(response, {
       rejectionMessage: 'Displayed address was rejected'
     })
