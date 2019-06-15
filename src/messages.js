@@ -123,7 +123,7 @@ export function MsgDeposit(
   return {
     type: `cosmos-sdk/MsgDeposit`,
     value: {
-      depositer: senderAddress,
+      depositor: senderAddress,
       proposal_id: proposalId,
       amount: amounts.map(Coin)
     }
