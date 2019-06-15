@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.23] - 2019-06-15
+
+### Changed
+
+- Renamed module to cosmos-api @faboweb
+
+### Fixed
+
+- Fixed depositing message @faboweb
+
 ## [0.0.22] - 2019-06-05
 
 ### Security
