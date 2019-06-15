@@ -1,4 +1,5 @@
-# Cosmos JS - Wrapper for Cosmos REST API
+# Cosmos API
+Cosmos API is a library for interacting with applications built on the Cosmos SDK.
 
 ## Install
 
