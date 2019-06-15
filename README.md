@@ -1,6 +1,6 @@
 # Cosmos Ledger
 
-Cosmos Ledger is a library for interacting with the Cosmos Ledger Nano App. It provides a developer-friendly interface and user friendly error messages for an improved user experience. 
+Cosmos Ledger is a library for interacting with the Cosmos Ledger Nano App. It provides a developer-friendly interface and user friendly error messages for an improved Ledger Nano development experience.
 
 This library is based on [ledger-cosmos-js](https://github.com/ZondaX/ledger-cosmos-js) by [Juan Leni](https://github.com/jleni) who also implemented the [official Cosmos Ledger Nano App](https://github.com/cosmos/ledger-cosmos). 
 
