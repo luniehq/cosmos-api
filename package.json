@@ -49,6 +49,7 @@
     },
     "transformIgnorePatterns": [
       "node_modules"
-    ]
+    ],
+    "collectCoverage": true
   }
 }
