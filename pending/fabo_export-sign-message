@@ -1,1 +1,1 @@
-[Added] Exports createSignMessage to use in different contexts @faboweb
+[Added] Export some lower level api calls to make it easier to integrate into other libs @faboweb
