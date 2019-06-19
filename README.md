@@ -47,3 +47,67 @@ const api = API(STARGATE_URL)
 
 const validators = await api.validators()
 ```
+
+### Create a sign message to sign with on a Ledger or with any other signer
+
+```
+const { signWithPrivateKey } = require('@lunie/cosmos-keys');
+const { createSignMessage } = require('@lunie/cosmos-api');
+
+const stdTx = {
+  msg: [
+    {
+      type: `cosmos-sdk/Send`,
+      value: {
+        inputs: [
+          {
+            address: `cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66`,
+            coins: [{ denom: `STAKE`, amount: `1` }]
+          }
+        ],
+        outputs: [
+          {
+            address: `cosmos1yeckxz7tapz34kjwnjxvmxzurerquhtrmxmuxt`,
+            coins: [{ denom: `STAKE`, amount: `1` }]
+          }
+        ]
+      }
+    }
+  ],
+  fee: { amount: [{ denom: ``, amount: `0` }], gas: `21906` },
+  signatures: null,
+  memo: ``
+}
+
+const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId });
+const signature = signWithPrivateKey(signMessage, Buffer.from(wallet.privateKey, 'hex'));
+```
+
+### Create a ready to broadcast signed transaction from a message
+
+```
+const { signWithPrivateKey } = require('@lunie/cosmos-keys');
+const { createSignedTransaction } = require('@lunie/cosmos-api');
+
+const sendMsg = {
+  type: `cosmos-sdk/Send`,
+  value: {
+    inputs: [
+      {
+        address: `cosmos1qperwt9wrnkg5k9e5gzfgjppzpqhyav5j24d66`,
+        coins: [{ denom: `STAKE`, amount: `1` }]
+      }
+    ],
+    outputs: [
+      {
+        address: `cosmos1yeckxz7tapz34kjwnjxvmxzurerquhtrmxmuxt`,
+        coins: [{ denom: `STAKE`, amount: `1` }]
+      }
+    ]
+  }
+}
+
+const signer = signMessage = > signWithPrivateKey(signMessage, Buffer.from(wallet.privateKey, 'hex'))
+
+const signMessage = createSignedTransaction({ gas: 1000, gasPrices = [{ amount: "10", denom: "uatom" }], memo = `Hi from Lunie` }, [sendMsg], signer, chainId: "test-chain", accountNumber: 0, sequence: 12);
+```
