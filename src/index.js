@@ -104,3 +104,5 @@ export default class Cosmos {
     return simulate(this.url, senderAddress, chainId, message, memo, sequence, accountNumber)
   }
 }
+
+export { createSignMessage } from "./signature"
