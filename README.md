@@ -83,7 +83,7 @@ const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId 
 const signature = signWithPrivateKey(signMessage, Buffer.from(wallet.privateKey, 'hex'));
 ```
 
-### Create a ready to broadcast signed transaction from a message
+### Create and sign a transaction from a message which then is ready to be broadcast
 
 ```
 const { signWithPrivateKey } = require('@lunie/cosmos-keys');
