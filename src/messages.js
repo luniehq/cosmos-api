@@ -1,5 +1,5 @@
 // Bank
-export function MsgSend (
+export function MsgSend(
   senderAddress,
   {
     toAddress,
@@ -17,7 +17,7 @@ export function MsgSend (
 }
 
 // Staking
-export function MsgDelegate (
+export function MsgDelegate(
   senderAddress,
   {
     validatorAddress,
@@ -35,7 +35,7 @@ export function MsgDelegate (
   }
 }
 
-export function MsgUndelegate (
+export function MsgUndelegate(
   senderAddress,
   {
     validatorAddress,
@@ -53,11 +53,11 @@ export function MsgUndelegate (
   }
 }
 
-export function MsgRedelegate (
+export function MsgRedelegate(
   senderAddress,
   {
-    validatorSrcAddress,
-    validatorDstAddress,
+    validatorSourceAddress,
+    validatorDestinationAddress,
     amount,
     denom
   }
@@ -66,8 +66,8 @@ export function MsgRedelegate (
     type: `cosmos-sdk/MsgBeginRedelegate`,
     value: {
       delegator_address: senderAddress,
-      validator_src_address: validatorSrcAddress,
-      validator_dst_address: validatorDstAddress,
+      validator_src_address: validatorSourceAddress,
+      validator_dst_address: validatorDestinationAddress,
       amount: Coin({ amount, denom })
     }
   }
@@ -75,7 +75,7 @@ export function MsgRedelegate (
 
 // Governance
 
-export function MsgSubmitProposal (
+export function MsgSubmitProposal(
   senderAddress,
   {
     proposalType,
@@ -96,7 +96,7 @@ export function MsgSubmitProposal (
   }
 }
 
-export function MsgVote (
+export function MsgVote(
   senderAddress,
   {
     proposalId,
@@ -113,7 +113,7 @@ export function MsgVote (
   }
 }
 
-export function MsgDeposit (
+export function MsgDeposit(
   senderAddress,
   {
     proposalId,
@@ -130,7 +130,7 @@ export function MsgDeposit (
   }
 }
 
-export function MsgWithdrawDelegationReward (
+export function MsgWithdrawDelegationReward(
   senderAddress,
   {
     validatorAddress
@@ -145,7 +145,7 @@ export function MsgWithdrawDelegationReward (
   }
 }
 
-function Coin ({ amount, denom }) {
+function Coin({ amount, denom }) {
   return ({
     amount: String(amount),
     denom
