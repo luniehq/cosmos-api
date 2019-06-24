@@ -1,6 +1,6 @@
 const config = {
   devtool: "cheap-source-map",
-  entry: ['babel-polyfill', './src/index.js'],
+  entry: ['./src/index.js'],
   output: {
     path: __dirname + '/lib',
     filename: 'cosmos.js',
