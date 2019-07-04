@@ -114,7 +114,7 @@ const signMessage = createSignedTransaction({ gas: 1000, gasPrices = [{ amount: 
 
 ## Environment
 
-Install polyfills:
+In nodejs you need some polyfills:
 
 ```
 yarn add isomorphic-fetch babel-polyfill
