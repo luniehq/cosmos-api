@@ -1,7 +1,7 @@
-import _Getters from "./getters"
-import send from "./send"
-import simulate from "./simulate"
-import * as MessageConstructors from "./messages"
+import _Getters from './getters'
+import send from './send'
+import simulate from './simulate'
+import * as MessageConstructors from './messages'
 
 /*
 * Sender object to build and send transactions
@@ -54,8 +54,8 @@ export default class Cosmos {
 
   async setChainId(chainId = this.chainId) {
     if (!chainId) {
-      const { block_meta: { header: { chain_id } } } = await this.get.block("latest")
-      this.chainId = chain_id
+      const { block_meta: { header: { chain_id: chainId } } } = await this.get.block('latest')
+      this.chainId = chainId
       return
     }
     this.chainId = chainId
@@ -104,3 +104,6 @@ export default class Cosmos {
     return simulate(this.url, senderAddress, chainId, message, memo, sequence, accountNumber)
   }
 }
+
+export { createSignedTransaction } from './send'
+export { createSignMessage } from './signature'

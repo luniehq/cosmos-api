@@ -1,15 +1,17 @@
-"use strict"
+'use strict'
+
+/* eslint-env browser */
 
 const RETRIES = 4
 
-export default function Getters(cosmosRESTURL) {
+export default function Getters (cosmosRESTURL) {
   // request and retry
-  function get(path, tries = RETRIES) {
+  function get (path, tries = RETRIES) {
     while (tries) {
       try {
         return fetch(cosmosRESTURL + path).then(res => res.json())
       } catch (err) {
-        if (--tries == 0) {
+        if (--tries === 0) {
           throw err
         }
       }
@@ -87,9 +89,7 @@ export default function Getters(cosmosRESTURL) {
 
     /* ============ STAKE ============ */
     stakingTxs: async function (address, valAddress) {
-      // const validatorAddress = delegatorToValidatorAddress(address)
-      // console.log(validatorAddress)
-      return await Promise.all([
+      return Promise.all([
         get(
           `/txs?action=create_validator&destination-validator=${valAddress}`),
         get(
@@ -203,7 +203,7 @@ export default function Getters(cosmosRESTURL) {
     govTallyingParameters: () => get(`/gov/parameters/tallying`),
     govVotingParameters: () => get(`/gov/parameters/voting`),
     governanceTxs: async function (address) {
-      return await Promise.all([
+      return Promise.all([
         get(`/txs?action=submit_proposal&proposer=${address}`),
         get(`/txs?action=deposit&depositor=${address}`),
         get(`/txs?action=vote&voter=${address}`)
@@ -217,7 +217,7 @@ export default function Getters(cosmosRESTURL) {
     },
     /* ============ Distribution ============ */
     distributionTxs: async function (address, valAddress) {
-      return await Promise.all([
+      return Promise.all([
         get(`/txs?action=set_withdraw_address&delegator=${address}`),
         get(`/txs?action=withdraw_delegator_reward&delegator=${address}`),
         get(`/txs?action=withdraw_validator_rewards_all&source-validator=${valAddress}`)
