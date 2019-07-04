@@ -50,9 +50,16 @@ const validators = await api.validators()
 
 ## Environment
 
-If using this library in a server side environment (ie. Node.js) you need to polyfill `fetch`. Do so by using [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch):
+Install polyfills:
+
+```
+yarn add isomorphic-fetch babel-polyfill
+```
+
+Then use those polyfills before instantiating CosmosJS
 
 ```
 require('isomorphic-fetch');
-const Cosmos = require('@lunie/cosmos-api');
+require('babel-polyfill');
+const Cosmos = require('@lunie/cosmos-api').default;
 ```

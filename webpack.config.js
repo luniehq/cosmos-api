@@ -4,9 +4,10 @@ const config = {
   output: {
     path: __dirname + '/lib',
     filename: 'cosmos.js',
-    library: 'cosmos-js',
+    library: 'cosmos-api',
     libraryTarget: 'umd',
     umdNamedDefine: true,
+    globalObject: 'typeof self !== \'undefined\' ? self : this',
   },
   module: {
     rules: [
