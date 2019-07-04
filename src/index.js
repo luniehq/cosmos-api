@@ -65,13 +65,13 @@ export default class Cosmos {
   }
 
   async getAccount(senderAddress) {
-    const { sequence, account_number } = await this.get.account(senderAddress)
+    const { sequence, account_number: accountNumber } = await this.get.account(senderAddress)
     this.accounts[senderAddress] = {
       // prevent downgrading a sequence number as we assume we send a transaction that hasn't affected the remote sequence number yet
       sequence: this.accounts[senderAddress] && sequence < this.accounts[senderAddress].sequence
         ? this.accounts[senderAddress].sequence
         : sequence,
-      accountNumber: account_number
+      accountNumber
     }
 
     return this.accounts[senderAddress]

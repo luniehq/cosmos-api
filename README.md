@@ -50,4 +50,9 @@ const validators = await api.validators()
 
 ## Environment
 
-If using this library in a server side environment (ie. Node.js) it depends on [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch). Make sure you have it installed.
+If using this library in a server side environment (ie. Node.js) you need to polyfill `fetch` do so by using [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch):
+
+```
+require('isomorphic-fetch');
+const Cosmos = require('@lunie/cosmos-api');
+```
