@@ -3,7 +3,7 @@
 ## Install
 
 ```
-yarn add @lunie/cosmos-api
+yarn add @lunie/cosmos-js
 ```
 
 ## Use
@@ -50,7 +50,7 @@ const validators = await api.validators()
 
 ## Environment
 
-If using this library in a server side environment (ie. Node.js) you need to polyfill `fetch` do so by using [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch):
+If using this library in a server side environment (ie. Node.js) you need to polyfill `fetch`. Do so by using [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch):
 
 ```
 require('isomorphic-fetch');

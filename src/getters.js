@@ -1,3 +1,5 @@
+"use strict"
+
 const RETRIES = 4
 
 export default function Getters(cosmosRESTURL) {
