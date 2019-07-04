@@ -1,7 +1,7 @@
-"use strict"
+'use strict'
 
 // convert an SDK error code into a meaningful text message
-export function getErrorMessage(code) {
+export function getErrorMessage (code) {
   return (
     {
       1: `internal error`,
