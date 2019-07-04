@@ -4,10 +4,9 @@ const config = {
   output: {
     path: __dirname + '/lib',
     filename: 'cosmos.js',
-    library: 'cosmos-api',
+    library: 'cosmos-js',
     libraryTarget: 'umd',
     umdNamedDefine: true,
-    globalObject: 'typeof self !== \'undefined\' ? self : this',
   },
   module: {
     rules: [
@@ -20,16 +19,6 @@ const config = {
         }
       }
     ]
-  },
-  externals: [
-    {
-      'isomorphic-fetch': {
-        root: 'isomorphic-fetch',
-        commonjs2: 'isomorphic-fetch',
-        commonjs: 'isomorphic-fetch',
-        amd: 'isomorphic-fetch'
-      }
-    }
-  ]
+  }
 }
 module.exports = config;

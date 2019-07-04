@@ -1,12 +1,13 @@
+"use strict"
+
 const RETRIES = 4
-const fetchImplementation = typeof fetch !== 'undefined' ? fetch : require('isomorphic-fetch');
 
 export default function Getters(cosmosRESTURL) {
   // request and retry
   function get(path, tries = RETRIES) {
     while (tries) {
       try {
-        return fetchImplementation(cosmosRESTURL + path).then(res => res.json())
+        return fetch(cosmosRESTURL + path).then(res => res.json())
       } catch (err) {
         if (--tries == 0) {
           throw err
@@ -23,7 +24,7 @@ export default function Getters(cosmosRESTURL) {
       return this.nodeVersion().then(() => true, () => false)
     },
 
-    nodeVersion: () => fetchImplementation(cosmosRESTURL + `/node_version`).then(res => res.text()),
+    nodeVersion: () => fetch(cosmosRESTURL + `/node_version`).then(res => res.text()),
 
     // coins
     account: function (address) {

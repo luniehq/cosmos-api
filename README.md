@@ -3,7 +3,7 @@
 ## Install
 
 ```
-yarn add @lunie/cosmos-api
+yarn add @lunie/cosmos-js
 ```
 
 ## Use
@@ -47,7 +47,3 @@ const api = API(STARGATE_URL)
 
 const validators = await api.validators()
 ```
-
-## Environment
-
-If using this library in a server side environment (ie. Node.js) it depends on [isomorphic-fetch](https://www.npmjs.com/package/isomorphic-fetch). Make sure you have it installed.
