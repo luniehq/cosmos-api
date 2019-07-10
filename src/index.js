@@ -1,7 +1,7 @@
-import _Getters from "./getters"
-import send from "./send"
-import simulate from "./simulate"
-import * as MessageConstructors from "./messages"
+import _Getters from './getters'
+import send from './send'
+import simulate from './simulate'
+import * as MessageConstructors from './messages'
 
 /*
 * Sender object to build and send transactions
@@ -16,7 +16,7 @@ import * as MessageConstructors from "./messages"
 */
 
 export default class Cosmos {
-  constructor(cosmosRESTURL, chainId = undefined) {
+  constructor (cosmosRESTURL, chainId = undefined) {
     this.url = cosmosRESTURL
     this.get = {}
     this.accounts = {} // storing sequence numbers to not send two transactions with the same sequence number
@@ -52,10 +52,10 @@ export default class Cosmos {
     }
   }
 
-  async setChainId(chainId = this.chainId) {
+  async setChainId (chainId = this.chainId) {
     if (!chainId) {
-      const { block_meta: { header: { chain_id } } } = await this.get.block("latest")
-      this.chainId = chain_id
+      const { block_meta: { header: { chain_id: chainId } } } = await this.get.block('latest')
+      this.chainId = chainId
       return
     }
     this.chainId = chainId
@@ -63,14 +63,14 @@ export default class Cosmos {
     return chainId
   }
 
-  async getAccount(senderAddress) {
-    const { sequence, account_number } = await this.get.account(senderAddress)
+  async getAccount (senderAddress) {
+    const { sequence, account_number: accountNumber } = await this.get.account(senderAddress)
     this.accounts[senderAddress] = {
       // prevent downgrading a sequence number as we assume we send a transaction that hasn't affected the remote sequence number yet
       sequence: this.accounts[senderAddress] && sequence < this.accounts[senderAddress].sequence
         ? this.accounts[senderAddress].sequence
         : sequence,
-      accountNumber: account_number
+      accountNumber
     }
 
     return this.accounts[senderAddress]
@@ -80,7 +80,7 @@ export default class Cosmos {
   * message: object
   * signer: async (signMessage: string) => { signature: Buffer, publicKey: Buffer }
   */
-  async send(senderAddress, { gas, gasPrices, memo }, messages, signer) {
+  async send (senderAddress, { gas, gasPrices, memo }, messages, signer) {
     const chainId = await this.setChainId()
     const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
@@ -97,10 +97,13 @@ export default class Cosmos {
     }
   }
 
-  async simulate(senderAddress, { message, memo = undefined }) {
+  async simulate (senderAddress, { message, memo = undefined }) {
     const chainId = await this.setChainId()
     const { sequence, accountNumber } = await this.getAccount(senderAddress)
 
     return simulate(this.url, senderAddress, chainId, message, memo, sequence, accountNumber)
   }
 }
+
+export { createSignedTransaction } from './send'
+export { createSignMessage } from './signature'
