@@ -57,6 +57,8 @@ export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, t
   }
 
   assertOk(includedTx)
+
+  return includedTx
 }
 // attaches the request meta data to the message
 function createStdTx({ gas, gasPrices, memo }, messages) {
