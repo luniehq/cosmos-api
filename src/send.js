@@ -4,8 +4,8 @@ import { createSignMessage, createSignature } from './signature'
 
 const DEFAULT_GAS_PRICE = [{ amount: (2.5e-8).toFixed(9), denom: `uatom` }]
 
-export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = `` }, messages, signer, cosmosRESTURL, chainId, accountNumber, sequence) {
-  const signedTx = await createSignedTransaction({ gas, gasPrices: DEFAULT_GAS_PRICE, memo: `` }, messages, signer, chainId, accountNumber, sequence)
+export default async function send ({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = `` }, messages, signer, cosmosRESTURL, chainId, accountNumber, sequence) {
+  const signedTx = await createSignedTransaction({ gas, gasPrices, memo }, messages, signer, chainId, accountNumber, sequence)
 
   // broadcast transaction with signatures included
   const body = createBroadcastBody(signedTx, `sync`)
@@ -20,7 +20,7 @@ export default async function send({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = 
   }
 }
 
-export async function createSignedTransaction({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = `` }, messages, signer, chainId, accountNumber, sequence) {
+export async function createSignedTransaction ({ gas, gasPrices = DEFAULT_GAS_PRICE, memo = `` }, messages, signer, chainId, accountNumber, sequence) {
   // sign transaction
   const stdTx = createStdTx({ gas, gasPrices, memo }, messages)
   const signMessage = createSignMessage(stdTx, { sequence, accountNumber, chainId })
@@ -39,7 +39,7 @@ export async function createSignedTransaction({ gas, gasPrices = DEFAULT_GAS_PRI
 
 // wait for inclusion of a tx in a block
 // Default waiting time: 60 * 3s = 180s
-export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, timeout = 3000) {
+export async function queryTxInclusion (txHash, cosmosRESTURL, iterations = 60, timeout = 3000) {
   let includedTx
   while (iterations-- > 0) {
     try {
@@ -66,9 +66,12 @@ export async function queryTxInclusion(txHash, cosmosRESTURL, iterations = 60, t
   }
 
   assertOk(includedTx)
+
+  return includedTx
 }
+
 // attaches the request meta data to the message
-export function createStdTx({ gas, gasPrices, memo }, messages) {
+export function createStdTx ({ gas, gasPrices, memo }, messages) {
   const fees = gasPrices.map(({ amount, denom }) => ({ amount: String(Math.round(amount * gas)), denom }))
     .filter(({ amount }) => amount > 0)
   return {
@@ -84,7 +87,7 @@ export function createStdTx({ gas, gasPrices, memo }, messages) {
 
 // the broadcast body consists of the signed tx and a return type
 // returnType can be block (inclusion in block), async (right away), sync (after checkTx has passed)
-function createBroadcastBody(signedTx, returnType = `sync`) {
+function createBroadcastBody (signedTx, returnType = `sync`) {
   return JSON.stringify({
     tx: signedTx,
     mode: returnType
@@ -92,14 +95,14 @@ function createBroadcastBody(signedTx, returnType = `sync`) {
 }
 
 // adds the signature object to the tx
-function createSignedTransactionObject(tx, signature) {
+function createSignedTransactionObject (tx, signature) {
   return Object.assign({}, tx, {
     signatures: [signature]
   })
 }
 
 // assert that a transaction was sent successful
-function assertOk(res) {
+function assertOk (res) {
   if (Array.isArray(res)) {
     if (res.length === 0) throw new Error(`Error sending transaction`)
 
