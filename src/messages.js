@@ -1,5 +1,5 @@
 // Bank
-export function MsgSend(
+export function MsgSend (
   senderAddress,
   {
     toAddress,
@@ -17,10 +17,10 @@ export function MsgSend(
 }
 
 // Staking
-export function MsgDelegate(
+export function MsgDelegate (
   senderAddress,
   {
-    validator_address,
+    validatorAddress,
     amount,
     denom
   }
@@ -29,16 +29,16 @@ export function MsgDelegate(
     type: `cosmos-sdk/MsgDelegate`,
     value: {
       delegator_address: senderAddress,
-      validator_address,
+      validator_address: validatorAddress,
       amount: Coin({ amount, denom })
     }
   }
 }
 
-export function MsgUndelegate(
+export function MsgUndelegate (
   senderAddress,
   {
-    validator_address,
+    validatorAddress,
     amount,
     denom
   }
@@ -46,18 +46,18 @@ export function MsgUndelegate(
   return {
     type: `cosmos-sdk/MsgUndelegate`,
     value: {
-      validator_address,
+      validator_address: validatorAddress,
       delegator_address: senderAddress,
       amount: Coin({ amount, denom })
     }
   }
 }
 
-export function MsgRedelegate(
+export function MsgRedelegate (
   senderAddress,
   {
-    validator_src_address,
-    validator_dst_address,
+    validatorSourceAddress,
+    validatorDestinationAddress,
     amount,
     denom
   }
@@ -66,8 +66,8 @@ export function MsgRedelegate(
     type: `cosmos-sdk/MsgBeginRedelegate`,
     value: {
       delegator_address: senderAddress,
-      validator_src_address,
-      validator_dst_address,
+      validator_src_address: validatorSourceAddress,
+      validator_dst_address: validatorDestinationAddress,
       amount: Coin({ amount, denom })
     }
   }
@@ -75,7 +75,7 @@ export function MsgRedelegate(
 
 // Governance
 
-export function MsgSubmitProposal(
+export function MsgSubmitProposal (
   senderAddress,
   {
     proposalType,
@@ -96,7 +96,7 @@ export function MsgSubmitProposal(
   }
 }
 
-export function MsgVote(
+export function MsgVote (
   senderAddress,
   {
     proposalId,
@@ -113,7 +113,7 @@ export function MsgVote(
   }
 }
 
-export function MsgDeposit(
+export function MsgDeposit (
   senderAddress,
   {
     proposalId,
@@ -130,7 +130,7 @@ export function MsgDeposit(
   }
 }
 
-export function MsgWithdrawDelegationReward(
+export function MsgWithdrawDelegationReward (
   senderAddress,
   {
     validatorAddress
@@ -145,7 +145,7 @@ export function MsgWithdrawDelegationReward(
   }
 }
 
-function Coin({ amount, denom }) {
+function Coin ({ amount, denom }) {
   return ({
     amount: String(amount),
     denom
@@ -153,12 +153,12 @@ function Coin({ amount, denom }) {
 }
 
 export default {
-  "MsgSend": MsgSend,
-  "MsgDelegate": MsgDelegate,
-  "MsgUndelegate": MsgUndelegate,
-  "MsgRedelegate": MsgRedelegate,
-  "MsgSubmitProposal": MsgSubmitProposal,
-  "MsgVote": MsgVote,
-  "MsgDeposit": MsgDeposit,
-  "MsgWithdrawDelegationReward": MsgWithdrawDelegationReward
+  'MsgSend': MsgSend,
+  'MsgDelegate': MsgDelegate,
+  'MsgUndelegate': MsgUndelegate,
+  'MsgRedelegate': MsgRedelegate,
+  'MsgSubmitProposal': MsgSubmitProposal,
+  'MsgVote': MsgVote,
+  'MsgDeposit': MsgDeposit,
+  'MsgWithdrawDelegationReward': MsgWithdrawDelegationReward
 }

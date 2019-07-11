@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.1.1] - 2019-07-10
+
+### Added
+
+- Export some lower level api calls to make it easier to integrate into other libs @faboweb
+- Return included transaction @faboweb
+
+### Repository
+
+- Made repo CI ready @faboweb
+
 ## [0.0.23] - 2019-06-15
 
 ### Changed

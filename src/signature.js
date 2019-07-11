@@ -10,7 +10,7 @@ type StdSignMsg struct {
   Memo          string      `json:"memo"`
 }
 */
-export function createSignMessage(
+export function createSignMessage (
   jsonTx,
   { sequence, accountNumber, chainId }
 ) {
@@ -32,15 +32,15 @@ export function createSignMessage(
   )
 }
 
-export function createSignature(
+export function createSignature (
   signature,
   sequence,
-  account_number,
+  accountNumber,
   publicKey
 ) {
   return {
     signature: signature.toString(`base64`),
-    account_number,
+    account_number: accountNumber,
     sequence,
     pub_key: {
       type: `tendermint/PubKeySecp256k1`, // TODO: allow other keytypes
@@ -49,7 +49,7 @@ export function createSignature(
   }
 }
 
-export function removeEmptyProperties(jsonTx) {
+export function removeEmptyProperties (jsonTx) {
   if (Array.isArray(jsonTx)) {
     return jsonTx.map(removeEmptyProperties)
   }
