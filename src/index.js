@@ -86,7 +86,7 @@ export default class Cosmos {
       hash,
       included
     } = await send({ gas, gasPrices, memo }, messages, signer, this.url, chainId, accountNumber, sequence)
-    this.accounts[senderAddress].sequence += 1
+    this.accounts[senderAddress].sequence = (parseInt(this.accounts[senderAddress].sequence) + 1).toString();
 
     return {
       hash,
