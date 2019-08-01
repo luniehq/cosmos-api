@@ -54,7 +54,8 @@ export default class Cosmos {
 
   async setChainId (chainId = this.chainId) {
     if (!chainId) {
-      const { block_meta: { header: { chain_id: chainId } } } = await this.get.block('latest')
+      const { block_meta: { header: { chain_id: latestChainId } } } = await this.get.block('latest')
+      chainId = latestChainId
     }
     this.chainId = chainId
 
@@ -86,7 +87,7 @@ export default class Cosmos {
       hash,
       included
     } = await send({ gas, gasPrices, memo }, messages, signer, this.url, chainId, accountNumber, sequence)
-    this.accounts[senderAddress].sequence += 1
+    this.accounts[senderAddress].sequence = (parseInt(this.accounts[senderAddress].sequence) + 1).toString();
 
     return {
       hash,
