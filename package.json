@@ -1,6 +1,6 @@
 {
   "name": "@lunie/cosmos-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Wrapper around getting and sending transactions from and to applications build on top of the Cosmos SDK",
   "main": "lib/cosmos.js",
   "scripts": {

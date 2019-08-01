@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.1.2] - 2019-08-01
+
+### Added
+
+- Added minting endpoints @faboweb
+
 ## [0.1.1] - 2019-07-10
 
 ### Added
