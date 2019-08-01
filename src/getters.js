@@ -236,7 +236,7 @@ export default function Getters (cosmosRESTURL) {
     delegatorRewards: function (delegatorAddr) {
       return get(`/distribution/delegators/${delegatorAddr}/rewards`)
     },
-    delegatorRewardsFromValidator: function (delegatorAddr, validatorAddr) {
+    delegatorRewardsFromValidator: async function (delegatorAddr, validatorAddr) {
       return (await get(
         `/distribution/delegators/${delegatorAddr}/rewards/${validatorAddr}`
       )) || []
@@ -254,14 +254,14 @@ export default function Getters (cosmosRESTURL) {
       return get(`/distribution/outstanding_rewards`)
     },
 
-    annualProvisionedTokens: function() {
+    annualProvisionedTokens: function () {
       return get(`/minting/annual-provisions`)
     },
-    inflation: function() {
+    inflation: function () {
       return get(`/minting/inflation`)
     },
-    mintingParameters: function() {
+    mintingParameters: function () {
       return get(`/minting/parameters`)
-    },
+    }
   }
 }
