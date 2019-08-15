@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const GAS_ADJUSTMENT = 1.5
+const GAS_ADJUSTMENT = 1.7
 
 export default async function simulate (
   cosmosRESTURL,
