@@ -25,9 +25,16 @@ const BECH32PREFIX = `cosmos`
 export default class Ledger {
   private readonly testModeAllowed: Boolean
   private cosmosApp: any
-
-  constructor({ testModeAllowed = false }: { testModeAllowed: Boolean }) {
+  private hdPath: Array<number>
+  private hrp: string
+  constructor(
+    { testModeAllowed = false }: { testModeAllowed: Boolean },
+    hdPath: Array<number> = HDPATH,
+    hrp: string = BECH32PREFIX
+  ) {
     this.testModeAllowed = testModeAllowed
+    this.hdPath = hdPath
+    this.hrp = hrp
   }
 
   // quickly test connection and compatibility with the Ledger device throwing away the connection
@@ -43,7 +50,7 @@ export default class Ledger {
   // check if the connection we established with the Ledger device is working
   private async isSendingData() {
     // check if the device is connected or on screensaver mode
-    const response = await this.cosmosApp.publicKey(HDPATH)
+    const response = await this.cosmosApp.publicKey(this.hdPath)
     this.checkLedgerErrors(response, {
       timeoutMessag: 'Could not find a connected and unlocked Ledger device'
     })
@@ -113,7 +120,7 @@ export default class Ledger {
   async getPubKey() {
     await this.connect()
 
-    const response = await this.cosmosApp.publicKey(HDPATH)
+    const response = await this.cosmosApp.publicKey(this.hdPath)
     this.checkLedgerErrors(response)
     return response.compressed_pk
   }
@@ -136,7 +143,7 @@ export default class Ledger {
       return
     }
 
-    const response = await this.cosmosApp.getAddressAndPubKey(HDPATH, BECH32PREFIX)
+    const response = await this.cosmosApp.getAddressAndPubKey(this.hdPath, this.hrp)
     this.checkLedgerErrors(response, {
       rejectionMessage: 'Displayed address was rejected'
     })
@@ -148,7 +155,7 @@ export default class Ledger {
   async sign(signMessage: string) {
     await this.connect()
 
-    const response = await this.cosmosApp.sign(HDPATH, signMessage)
+    const response = await this.cosmosApp.sign(this.hdPath, signMessage)
     this.checkLedgerErrors(response)
     // we have to parse the signature from Ledger as it's in DER format
     const parsedSignature = signatureImport(response.signature)
