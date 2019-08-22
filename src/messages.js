@@ -87,10 +87,14 @@ export function MsgSubmitProposal (
   return {
     type: `cosmos-sdk/MsgSubmitProposal`,
     value: {
+      content: {
+        type: 'cosmos-sdk/TextProposal',
+        value: {
+          title,
+          description
+        }
+      },
       proposer: senderAddress,
-      proposal_type: proposalType,
-      title,
-      description,
       initial_deposit: initialDeposits.map(Coin)
     }
   }

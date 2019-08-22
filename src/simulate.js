@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const GAS_ADJUSTMENT = 1.7
+const GAS_ADJUSTMENT = 2.3
 
 export default async function simulate (
   cosmosRESTURL,
@@ -23,6 +23,21 @@ export default async function simulate (
     'cosmos-sdk/MsgWithdrawDelegationReward': () => `/distribution/delegators/${senderAddress}/rewards`
   }[type]()
   const url = `${cosmosRESTURL}${path}`
+
+  // the simulate endpoint is out of sync right now: https://github.com/cosmos/cosmos-sdk/issues/4929
+  if (type === 'cosmos-sdk/MsgSubmitProposal') {
+    const fixedMessage = {
+      type: 'cosmos-sdk/MsgSubmitProposal',
+      value: {
+        title: msg.value.content.value.title,
+        description: msg.value.content.value.description,
+        proposal_type: 'Text',
+        proposer: msg.value.proposer,
+        initial_deposit: msg.value.initial_deposit
+      }
+    }
+    msg = fixedMessage
+  }
 
   const tx = createRESTPOSTObject(senderAddress, chainId, { sequence, accountNumber, memo }, msg)
 
