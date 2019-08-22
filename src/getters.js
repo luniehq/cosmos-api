@@ -187,6 +187,9 @@ export default function Getters (cosmosRESTURL) {
     validatorSigningInfo: function (pubKey) {
       return get(`/slashing/validators/${pubKey}/signing_info`)
     },
+    validatorSigningInfos: function () {
+      return get(`/slashing/signing_infos`)
+    },
 
     /* ============ Governance ============ */
 
