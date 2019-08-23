@@ -6,10 +6,29 @@ const RETRIES = 4
 
 export default function Getters (cosmosRESTURL) {
   // request and retry
-  function get (path, tries = RETRIES) {
+  async function get (path, { page, limit, all } = { page: 1, limit: 30, all: false }, tries = RETRIES) {
     while (tries) {
       try {
-        return fetch(cosmosRESTURL + path).then(res => res.json())
+        let url = cosmosRESTURL + path
+        const isTxsPagination = path.startsWith('/txs?')
+        if (isTxsPagination) url = url + `&page=${page}&limit=${limit}`
+
+        const response = await fetch(url).then(res => res.json())
+
+        // handle txs pagination
+        if (isTxsPagination) {
+          if (!all || Number(response.page_number) >= Number(response.page_total)) return response.txs
+
+          return response.txs.concat(await get(path, { page: page + 1, limit, all }))
+        }
+
+        // handle height wrappers
+        // most responses are wrapped in a construct containing height and the actual result
+        if (response.height !== undefined && response.result !== undefined) {
+          return response.result
+        }
+
+        return response.result
       } catch (err) {
         if (--tries === 0) {
           throw err
@@ -68,36 +87,31 @@ export default function Getters (cosmosRESTURL) {
           throw err
         })
     },
-    txs: function (addr) {
-      return Promise.all([
-        this.bankTxs(addr),
-        this.governanceTxs(addr),
-        this.distributionTxs(addr),
-        this.stakingTxs(addr)
-      ]).then((txs) => [].concat(...txs))
+    txs: function (addr, paginationOptions) {
+      return get(`/txs?message.sender=${addr}`, paginationOptions)
     },
-    bankTxs: function (addr) {
+    bankTxs: function (addr, paginationOptions) {
       return Promise.all([
-        get(`/txs?sender=${addr}`),
-        get(`/txs?recipient=${addr}`)
+        get(`/txs?message.sender=${addr}`, paginationOptions),
+        get(`/txs?message.recipient=${addr}`, paginationOptions)
       ]).then(([senderTxs, recipientTxs]) => [].concat(senderTxs, recipientTxs))
     },
-    txsByHeight: function (height) {
-      return get(`/txs?tx.height=${height}`)
+    txsByHeight: function (height, paginationOptions) {
+      return get(`/txs?tx.height=${height}`, paginationOptions)
     },
     tx: hash => get(`/txs/${hash}`),
 
     /* ============ STAKE ============ */
-    stakingTxs: async function (address, valAddress) {
+    stakingTxs: async function (address, valAddress, paginationOptions) {
       return Promise.all([
         get(
-          `/txs?action=create_validator&destination-validator=${valAddress}`),
+          `/txs?message.action=create_validator&message.destination-validator=${valAddress}`, paginationOptions),
         get(
-          `/txs?action=edit_validator&destination-validator=${valAddress}`),
-        get(`/txs?action=delegate&delegator=${address}`),
-        get(`/txs?action=begin_redelegate&delegator=${address}`),
-        get(`/txs?action=begin_unbonding&delegator=${address}`),
-        get(`/txs?action=unjail&source-validator=${valAddress}`)
+          `/txs?message.action=edit_validator&message.destination-validator=${valAddress}`, paginationOptions),
+        get(`/txs?message.action=delegate&message.delegator=${address}`),
+        get(`/txs?message.action=begin_redelegate&message.delegator=${address}`, paginationOptions),
+        get(`/txs?message.action=begin_unbonding&message.delegator=${address}`, paginationOptions),
+        get(`/txs?message.action=unjail&message.source-validator=${valAddress}`, paginationOptions)
       ]).then(([
         createValidatorTxs,
         editValidatorTxs,
@@ -207,9 +221,9 @@ export default function Getters (cosmosRESTURL) {
     govVotingParameters: () => get(`/gov/parameters/voting`),
     governanceTxs: async function (address) {
       return Promise.all([
-        get(`/txs?action=submit_proposal&proposer=${address}`),
-        get(`/txs?action=deposit&depositor=${address}`),
-        get(`/txs?action=vote&voter=${address}`)
+        get(`/txs?message.action=submit_proposal&message.proposer=${address}`),
+        get(`/txs?message.action=deposit&message.depositor=${address}`),
+        get(`/txs?message.action=vote&message.voter=${address}`)
       ]).then(([submitProposalTxs, depositTxs, voteTxs]) =>
         [].concat(submitProposalTxs, depositTxs, voteTxs)
       )
@@ -221,9 +235,9 @@ export default function Getters (cosmosRESTURL) {
     /* ============ Distribution ============ */
     distributionTxs: async function (address, valAddress) {
       return Promise.all([
-        get(`/txs?action=set_withdraw_address&delegator=${address}`),
-        get(`/txs?action=withdraw_delegator_reward&delegator=${address}`),
-        get(`/txs?action=withdraw_validator_rewards_all&source-validator=${valAddress}`)
+        get(`/txs?message.action=set_withdraw_address&message.delegator=${address}`),
+        get(`/txs?message.action=withdraw_delegator_reward&message.delegator=${address}`),
+        get(`/txs?message.action=withdraw_validator_rewards_all&message.source-validator=${valAddress}`)
       ]).then(([
         updateWithdrawAddressTxs,
         withdrawDelegationRewardsTxs,
