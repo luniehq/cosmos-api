@@ -56,9 +56,10 @@ export default function Getters (cosmosRESTURL) {
       }
       return get(`/auth/accounts/${address}`)
         .then(res => {
+          if (!res) return emptyAccount
+          let account = res.value || emptyAccount
           // HACK, hope for: https://github.com/cosmos/cosmos-sdk/issues/3885
-          let account = (res && res.value) || emptyAccount
-          if (res && res.type === `auth/DelayedVestingAccount`) {
+          if (res.type === `auth/DelayedVestingAccount`) {
             if (!account.BaseVestingAccount) {
               console.error(
                 `SDK format of vesting accounts responses has changed`
