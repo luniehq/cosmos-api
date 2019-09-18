@@ -28,7 +28,7 @@ export default function Getters (cosmosRESTURL) {
           return response.result
         }
 
-        return response.result
+        return response
       } catch (err) {
         if (--tries === 0) {
           throw err
