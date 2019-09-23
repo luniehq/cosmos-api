@@ -11,20 +11,20 @@ type StdSignMsg struct {
 }
 */
 export function createSignMessage (
-  jsonTx,
+  { type: stdTx, value: tx },
   { sequence, accountNumber, chainId }
 ) {
   // sign bytes need amount to be an array
   const fee = {
-    amount: jsonTx.fee.amount || [],
-    gas: jsonTx.fee.gas
+    amount: tx.fee.amount || [],
+    gas: tx.fee.gas
   }
 
   return JSON.stringify(
     removeEmptyProperties({
       fee,
-      memo: jsonTx.memo,
-      msgs: jsonTx.msg, // weird msg vs. msgs
+      memo: tx.memo,
+      msgs: tx.msg, // weird msg vs. msgs
       sequence,
       account_number: accountNumber,
       chain_id: chainId

@@ -80,13 +80,16 @@ export function createStdTx ({ gas, gasPrices, memo }, messages) {
   const fees = gasPrices.map(({ amount, denom }) => ({ amount: String(Math.round(amount * gas)), denom }))
     .filter(({ amount }) => amount > 0)
   return {
-    msg: Array.isArray(messages) ? messages : [messages],
-    fee: {
-      amount: fees.length > 0 ? fees : null,
-      gas
-    },
-    signatures: null,
-    memo
+    type: 'cosmos-sdk/StdTx',
+    value: {
+      msg: Array.isArray(messages) ? messages : [messages],
+      fee: {
+        amount: fees.length > 0 ? fees : [],
+        gas: '' + gas,
+      },
+      signatures: null,
+      memo
+    }
   }
 }
 
@@ -101,9 +104,8 @@ function createBroadcastBody (signedTx, returnType = `sync`) {
 
 // adds the signature object to the tx
 function createSignedTransactionObject (tx, signature) {
-  return Object.assign({}, tx, {
-    signatures: [signature]
-  })
+  tx.value.signatures = [signature];
+  return tx;
 }
 
 // assert that a transaction was sent successful
