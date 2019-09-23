@@ -25,7 +25,7 @@ export default function Getters (cosmosRESTURL) {
         // handle height wrappers
         // most responses are wrapped in a construct containing height and the actual result
         if (response.height !== undefined && response.result !== undefined) {
-          return response.result
+          response = response.result;
         }
 
         return response
