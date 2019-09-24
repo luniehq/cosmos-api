@@ -13,7 +13,7 @@ export default function Getters (cosmosRESTURL) {
         const isTxsPagination = path.startsWith('/txs?')
         if (isTxsPagination) url = url + `&page=${page}&limit=${limit}`
 
-        const response = await fetch(url).then(res => res.json())
+        let response = await fetch(url).then(res => res.json())
 
         // handle txs pagination
         if (isTxsPagination) {
