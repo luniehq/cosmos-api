@@ -56,8 +56,9 @@ export default function Getters (cosmosRESTURL) {
       }
       return get(`/auth/accounts/${address}`)
         .then(res => {
-          // HACK, hope for: https://github.com/cosmos/cosmos-sdk/issues/3885
+          if (!res) return emptyAccount
           let account = res.value || emptyAccount
+          // HACK, hope for: https://github.com/cosmos/cosmos-sdk/issues/3885
           if (res.type === `auth/DelayedVestingAccount`) {
             if (!account.BaseVestingAccount) {
               console.error(
