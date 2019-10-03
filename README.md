@@ -21,7 +21,9 @@ import Ledger from "@lunie/cosmos-ledger"
 
 const signMessage = ... message to sign, generate messages with "@lunie/cosmos-js"
 
-const ledger = await Ledger().connect()
+const ledger = new Ledger({ testModeAllowed: false })
+
+await ledger.connect()
 
 const signature = await ledger.sign(signMessage)
 ```
@@ -44,7 +46,8 @@ const msg = cosmos
 
 // create a signer from this local js signer library
 const ledgerSigner = async (signMessage) => {
-  const ledger = await Ledger().connect()
+  const ledger = new Ledger({ testModeAllowed: false })
+  await ledger.connect()
   const publicKey = await ledger.getPubKey()
   const signature = await ledger.sign(signMessage)
 
