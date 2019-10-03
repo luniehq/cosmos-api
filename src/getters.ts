@@ -1,25 +1,28 @@
 'use strict'
+import * as types from '../lib/types'
 
 /* eslint-env browser */
 
 const RETRIES = 4
 
-export default function Getters (cosmosRESTURL) {
+export default function Getters (cosmosRESTURL: string) {
   // request and retry
-  async function get (path, { page, limit, all } = { page: 1, limit: 30, all: false }, tries = RETRIES) {
+  async function get (path: string, options: types.PaginationOptions = { page: 1, limit: 30, all: false }, tries = RETRIES): Promise<types.Result> {
+    let response
     while (tries) {
       try {
         let url = cosmosRESTURL + path
         const isTxsPagination = path.startsWith('/txs?')
-        if (isTxsPagination) url = url + `&page=${page}&limit=${limit}`
+        if (isTxsPagination) url = url + `&page=${options.page}&limit=${options.limit}`
 
-        const response = await fetch(url).then(res => res.json())
+        response = await fetch(url).then(res => res.json())
 
         // handle txs pagination
         if (isTxsPagination) {
-          if (!all || Number(response.page_number) >= Number(response.page_total)) return response.txs
+          if (!options.all || Number(response.page_number) >= Number(response.page_total)) return response.txs
+          options.page = options.page + 1
 
-          return response.txs.concat(await get(path, { page: page + 1, limit, all }))
+          return response.txs.concat(await get(path, options))
         }
 
         // handle height wrappers
@@ -35,6 +38,7 @@ export default function Getters (cosmosRESTURL) {
         }
       }
     }
+    return response.result
   }
 
   return {
@@ -48,7 +52,7 @@ export default function Getters (cosmosRESTURL) {
     nodeVersion: () => fetch(cosmosRESTURL + `/node_version`).then(res => res.text()),
 
     // coins
-    account: function (address) {
+    account: function (address: string) {
       const emptyAccount = {
         coins: [],
         sequence: `0`,
@@ -88,22 +92,24 @@ export default function Getters (cosmosRESTURL) {
           throw err
         })
     },
-    txs: function (addr, paginationOptions) {
-      return get(`/txs?message.sender=${addr}`, paginationOptions)
+    txs: function (addr: string, pageOpts: types.PaginationOptions) {
+      return get(`/txs?message.sender=${addr}`, pageOpts)
     },
-    bankTxs: function (addr, paginationOptions) {
+    bankTxs: function (addr: string, pageOpts: types.PaginationOptions) {
       return Promise.all([
-        get(`/txs?message.sender=${addr}`, paginationOptions),
-        get(`/txs?message.recipient=${addr}`, paginationOptions)
-      ]).then(([senderTxs, recipientTxs]) => [].concat(senderTxs, recipientTxs))
+        get(`/txs?message.sender=${addr}`, pageOpts),
+        get(`/txs?message.recipient=${addr}`, pageOpts)
+      ]).then(([senderTxs, recipientTxs]: Array<any>) => [].concat(senderTxs, recipientTxs))
     },
-    txsByHeight: function (height, paginationOptions) {
-      return get(`/txs?tx.height=${height}`, paginationOptions)
+    txsByHeight: function (height: number, pageOpts: types.PaginationOptions) {
+      return get(`/txs?tx.height=${height}`, pageOpts)
     },
-    tx: hash => get(`/txs/${hash}`),
+    tx: function (hash: string) {
+      return get(`/txs/${hash}`)
+    },
 
     /* ============ STAKE ============ */
-    stakingTxs: async function (address, valAddress, paginationOptions) {
+    stakingTxs: async function (address:string, valAddress: string, paginationOptions: types.PaginationOptions) {
       return Promise.all([
         get(
           `/txs?message.action=create_validator&message.destination-validator=${valAddress}`, paginationOptions),
@@ -120,7 +126,7 @@ export default function Getters (cosmosRESTURL) {
         redelegationTxs,
         undelegationTxs,
         unjailTxs
-      ]) =>
+      ]: Array<any>) =>
         [].concat(
           createValidatorTxs,
           editValidatorTxs,
@@ -132,21 +138,20 @@ export default function Getters (cosmosRESTURL) {
       )
     },
     // Get all delegations information from a delegator
-    delegations: function (addr) {
+    delegations: function (addr: string) {
       return get(`/staking/delegators/${addr}/delegations`)
     },
-    undelegations: function (addr) {
+    undelegations: function (addr: string) {
       return get(
 
         `/staking/delegators/${addr}/unbonding_delegations`,
-        true
       )
     },
-    redelegations: function (addr) {
+    redelegations: function (addr: string) {
       return get(`/staking/redelegations?delegator=${addr}`)
     },
     // Query all validators that a delegator is bonded to
-    delegatorValidators: function (delegatorAddr) {
+    delegatorValidators: function (delegatorAddr: string) {
       return get(`/staking/delegators/${delegatorAddr}/validators`)
     },
     // Get a list containing all the validator candidates
@@ -154,11 +159,11 @@ export default function Getters (cosmosRESTURL) {
       get(`/staking/validators?status=unbonding`),
       get(`/staking/validators?status=bonded`),
       get(`/staking/validators?status=unbonded`)
-    ]).then((validatorGroups) =>
+    ]).then((validatorGroups: Array<any>) =>
       [].concat(...validatorGroups)
     ),
     // Get information from a validator
-    validator: function (addr) {
+    validator: function (addr: string) {
       return get(`/staking/validators/${addr}`)
     },
 
@@ -166,26 +171,18 @@ export default function Getters (cosmosRESTURL) {
     validatorSet: () => get(`/validatorsets/latest`),
 
     // Query a delegation between a delegator and a validator
-    delegation: function (delegatorAddr, validatorAddr) {
-      return get(
-
-        `/staking/delegators/${delegatorAddr}/delegations/${validatorAddr}`,
-        true
-      )
+    delegation: function (delegatorAddr: string, validatorAddr: string) {
+      return get(`/staking/delegators/${delegatorAddr}/delegations/${validatorAddr}`)
     },
-    unbondingDelegation: function (delegatorAddr, validatorAddr) {
-      return get(
-
-        `/staking/delegators/${delegatorAddr}/unbonding_delegations/${validatorAddr}`,
-        true
-      )
+    unbondingDelegation: function (delegatorAddr: string, validatorAddr:string) {
+      return get( `/staking/delegators/${delegatorAddr}/unbonding_delegations/${validatorAddr}`)
     },
     pool: () => get(`/staking/pool`),
     stakingParameters: () => get(`/staking/parameters`),
 
     /* ============ Slashing ============ */
 
-    validatorSigningInfo: function (pubKey) {
+    validatorSigningInfo: function (pubKey: types.PubKey) {
       return get(`/slashing/validators/${pubKey}/signing_info`)
     },
     validatorSigningInfos: function () {
@@ -195,55 +192,47 @@ export default function Getters (cosmosRESTURL) {
     /* ============ Governance ============ */
 
     proposals: () => get(`/gov/proposals`),
-    proposal: function (proposalId) {
+    proposal: function (proposalId: number) {
       return get(`/gov/proposals/${proposalId}`)
     },
-    proposalVotes: function (proposalId) {
+    proposalVotes: function (proposalId: number) {
       return get(`/gov/proposals/${proposalId}/votes`)
     },
-    proposalVote: function (proposalId, address) {
+    proposalVote: function (proposalId: number, address: string) {
       return get(`/gov/proposals/${proposalId}/votes/${address}`)
     },
-    proposalDeposits: function (proposalId) {
+    proposalDeposits: function (proposalId: number) {
       return get(`/gov/proposals/${proposalId}/deposits`)
     },
-    proposalDeposit: function (proposalId, address) {
-      return get(
-
-        `/gov/proposals/${proposalId}/deposits/${address}`,
-        true
-      )
+    proposalDeposit: function (proposalId: number, address: string) {
+      return get(`/gov/proposals/${proposalId}/deposits/${address}`)
     },
-    proposalTally: function (proposalId) {
+    proposalTally: function (proposalId: number) {
       return get(`/gov/proposals/${proposalId}/tally`)
     },
     govDepositParameters: () => get(`/gov/parameters/deposit`),
     govTallyingParameters: () => get(`/gov/parameters/tallying`),
     govVotingParameters: () => get(`/gov/parameters/voting`),
-    governanceTxs: async function (address) {
+    governanceTxs: async function (address: string) {
       return Promise.all([
         get(`/txs?message.action=submit_proposal&message.proposer=${address}`),
         get(`/txs?message.action=deposit&message.depositor=${address}`),
         get(`/txs?message.action=vote&message.voter=${address}`)
-      ]).then(([submitProposalTxs, depositTxs, voteTxs]) =>
+      ]).then(([submitProposalTxs, depositTxs, voteTxs]: Array<any>) =>
         [].concat(submitProposalTxs, depositTxs, voteTxs)
       )
     },
     /* ============ Explorer ============ */
-    block: function (blockHeight) {
+    block: function (blockHeight: number) {
       return get(`/blocks/${blockHeight}`)
     },
     /* ============ Distribution ============ */
-    distributionTxs: async function (address, valAddress) {
+    distributionTxs: async function (address: string, valAddress: string): Promise<any> {
       return Promise.all([
         get(`/txs?message.action=set_withdraw_address&message.delegator=${address}`),
         get(`/txs?message.action=withdraw_delegator_reward&message.delegator=${address}`),
         get(`/txs?message.action=withdraw_validator_rewards_all&message.source-validator=${valAddress}`)
-      ]).then(([
-        updateWithdrawAddressTxs,
-        withdrawDelegationRewardsTxs,
-        withdrawValidatorCommissionTxs
-      ]) =>
+      ]).then(([ updateWithdrawAddressTxs, withdrawDelegationRewardsTxs,withdrawValidatorCommissionTxs]: Array<any>) =>
         [].concat(
           updateWithdrawAddressTxs,
           withdrawDelegationRewardsTxs,
@@ -251,24 +240,24 @@ export default function Getters (cosmosRESTURL) {
         )
       )
     },
-    delegatorRewards: function (delegatorAddr) {
+    delegatorRewards: function (delegatorAddr: string) {
       return get(`/distribution/delegators/${delegatorAddr}/rewards`)
     },
-    delegatorRewardsFromValidator: async function (delegatorAddr, validatorAddr) {
+    delegatorRewardsFromValidator: async function (delegatorAddr: string, validatorAddr: string): Promise<types.Result> {
       return (await get(
         `/distribution/delegators/${delegatorAddr}/rewards/${validatorAddr}`
       )) || []
     },
-    validatorDistributionInformation: function (validatorAddr) {
+    validatorDistributionInformation: function (validatorAddr: string): Promise<types.Result> {
       return get(`/distribution/validators/${validatorAddr}`)
     },
-    validatorRewards: function (validatorAddr) {
+    validatorRewards: function (validatorAddr: string): Promise<types.Result> {
       return get(`/distribution/validators/${validatorAddr}/rewards`)
     },
-    distributionParameters: function () {
+    distributionParameters: function (): Promise<types.Result> {
       return get(`/distribution/parameters`)
     },
-    distributionOutstandingRewards: function () {
+    distributionOutstandingRewards: function (): Promise<types.Result> {
       return get(`/distribution/outstanding_rewards`)
     },
 

@@ -1,3 +1,5 @@
+import * as types from '../lib/types'
+
 /*
 The SDK expects a certain message format to serialize and then sign.
 
@@ -11,8 +13,8 @@ type StdSignMsg struct {
 }
 */
 export function createSignMessage (
-  jsonTx,
-  { sequence, accountNumber, chainId }
+  jsonTx: types.StdTx,
+  { sequence, account_number, chain_id }: types.TxHeader
 ) {
   // sign bytes need amount to be an array
   const fee = {
@@ -26,30 +28,30 @@ export function createSignMessage (
       memo: jsonTx.memo,
       msgs: jsonTx.msg, // weird msg vs. msgs
       sequence,
-      account_number: accountNumber,
-      chain_id: chainId
-    })
+      account_number: account_number,
+      chain_id: chain_id
+    }: types.StdTx)
   )
 }
 
 export function createSignature (
-  signature,
-  sequence,
-  accountNumber,
-  publicKey
+  signature: Buffer,
+  sequence: number,
+  accountNumber: number,
+  publicKey: Buffer
 ) {
   return {
-    signature: signature.toString(`base64`),
+    signature: (signature.toString('base64')),
     account_number: accountNumber,
     sequence,
     pub_key: {
       type: `tendermint/PubKeySecp256k1`, // TODO: allow other keytypes
-      value: publicKey.toString(`base64`)
+      value: publicKey.toString('base64')
     }
   }
 }
 
-export function removeEmptyProperties (jsonTx) {
+export function removeEmptyProperties (jsonTx: []types.StdTx): []types.StdTx {
   if (Array.isArray(jsonTx)) {
     return jsonTx.map(removeEmptyProperties)
   }

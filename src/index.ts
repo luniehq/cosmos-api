@@ -16,7 +16,7 @@ import * as MessageConstructors from './messages'
 */
 
 export default class Cosmos {
-  constructor (cosmosRESTURL, chainId = undefined) {
+  constructor (cosmosRESTURL: string, chainId = undefined) {
     this.url = cosmosRESTURL
     this.get = {}
     this.accounts = {} // storing sequence numbers to not send two transactions with the same sequence number
