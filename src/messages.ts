@@ -17,7 +17,7 @@ export function MsgSend (
 }
 
 // Staking
-export function MsgDelegate (
+export fuo:ion MsgDelegate (
   senderAddress,
   {
     validatorAddress,

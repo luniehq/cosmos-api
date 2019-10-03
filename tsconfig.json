@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "downlevelIteration": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "sourceMap": true,
+    "target": "es5",
+    "lib": ["es2017", "dom"],
+    "moduleResolution": "node",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "strict": true,
+    "esModuleInterop": true
+    //"noUnusedLocals": true,
+  },
+  "include": ["./src/**/*"]
+}
