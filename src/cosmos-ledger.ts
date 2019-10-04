@@ -6,7 +6,7 @@ const semver = require('semver')
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
 const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
-//const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
+// const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
 
 declare global {
   interface Window {
