@@ -28,7 +28,7 @@ export default class Ledger {
   private hdPath: Array<number>
   private hrp: string
   constructor(
-    { testModeAllowed = false }: { testModeAllowed: Boolean },
+    { testModeAllowed = false }: { testModeAllowed: Boolean } = { testModeAllowed: false },
     hdPath: Array<number> = HDPATH,
     hrp: string = BECH32PREFIX
   ) {
