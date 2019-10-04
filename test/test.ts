@@ -4,6 +4,12 @@ jest.mock('secp256k1', () => ({
   signatureImport: () => Buffer.from('1234')
 }))
 
+jest.mock('@ledgerhq/hw-transport-u2f', () => ({
+  default: {
+    create: async () => ({})
+  }
+}))
+
 const config = {
   testModeAllowed: false
 }
@@ -26,13 +32,13 @@ describe(`Ledger`, () => {
     it('connects', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
             }
           }
-          get_version() {
+          getVersion() {
             return {
               major: '1',
               minor: '5',
@@ -47,12 +53,9 @@ describe(`Ledger`, () => {
               error_message: 'No errors'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
+      const Ledger = require('../src/cosmos-ledger').default
       ledger = new Ledger(config)
       await ledger.connect()
     })
@@ -72,19 +75,16 @@ describe(`Ledger`, () => {
     it("fails if can't get data from device", async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'BIG ERROR'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
 
       await expect(ledger.connect()).rejects.toThrow('BIG ERROR')
     })
@@ -92,13 +92,13 @@ describe(`Ledger`, () => {
     it('fails if Cosmos App is outdated', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
             }
           }
-          get_version() {
+          getVersion() {
             return {
               major: '1',
               minor: '0',
@@ -107,13 +107,10 @@ describe(`Ledger`, () => {
               error_message: 'No errors'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
 
       await expect(ledger.connect()).rejects.toThrow(
         'Outdated version: Please update Ledger Cosmos App to the latest version.'
@@ -130,13 +127,10 @@ describe(`Ledger`, () => {
               device_locked: true
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
 
       await expect(ledger.connect()).rejects.toThrow('')
     })
@@ -147,7 +141,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '5',
             patch: '0',
@@ -166,7 +160,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '1',
             patch: '0',
@@ -185,7 +179,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '5',
             patch: '0',
@@ -308,7 +302,8 @@ describe(`Ledger`, () => {
           signature: Buffer.from('1234'), // needs to be a DER signature, but the upstream library is mockeed here
           error_message: 'No errors'
         }))
-      }
+      },
+      hdPath: [44, 118, 0, 0, 0]
     }
     const res = await ledger.sign.call(self, 'message')
     expect(self.connect).toHaveBeenCalled()
