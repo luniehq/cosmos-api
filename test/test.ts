@@ -32,7 +32,7 @@ describe(`Ledger`, () => {
     it('connects', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        default: class MockApp {
+        cosmosApp: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
@@ -75,7 +75,7 @@ describe(`Ledger`, () => {
     it("fails if can't get data from device", async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        default: class MockApp {
+        cosmosApp: class MockApp {
           publicKey() {
             return {
               error_message: 'BIG ERROR'
@@ -92,7 +92,7 @@ describe(`Ledger`, () => {
     it('fails if Cosmos App is outdated', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        default: class MockApp {
+        cosmosApp: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
@@ -232,11 +232,14 @@ describe(`Ledger`, () => {
   it('getCosmosAddress', async () => {
     const self = {
       connect: jest.fn(),
-      getPubKey: jest.fn(() => Buffer.from('1234'))
+      hrp: 'cosmos',
+      getPubKey: jest.fn(() =>
+        Buffer.from('52FDFC072182654F163F5F0F9A621D729566C74D10037C4D7BBB0407D1E2C64981', 'hex')
+      )
     }
     const res = await ledger.getCosmosAddress.call(self)
     expect(self.connect).toHaveBeenCalled()
-    expect(res).toBe('cosmos1l4aqmqyen0kawmy6pq5q27qhl3synfg8uqcsa5')
+    expect(res).toBe('cosmos1v3z3242hq7xrms35gu722v4nt8uux8nvug5gye')
   })
 
   it('getPubKey', async () => {
