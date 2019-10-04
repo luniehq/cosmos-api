@@ -1,5 +1,5 @@
-import App from 'ledger-cosmos-js'
-import { getCosmosAddress } from '@lunie/cosmos-keys'
+import { cosmosApp as App, getBech32FromPK } from 'ledger-cosmos-js'
+
 import { signatureImport } from 'secp256k1'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 const semver = require('semver')
@@ -130,7 +130,7 @@ export default class Ledger {
     await this.connect()
 
     const pubKey = await this.getPubKey()
-    return getCosmosAddress(pubKey)
+    return getBech32FromPK(this.hrp, pubKey)
   }
 
   // triggers a confirmation request of the cosmos address on the Ledger device
