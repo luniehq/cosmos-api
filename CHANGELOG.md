@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
-## [0.0.5] - 2019-06-12
+
+## [0.0.6] - 2019-10-07
+
+
+### Repository
+
+- Reduced size of library @williamchong007
 
 ### Fixed
 
