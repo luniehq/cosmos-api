@@ -49,8 +49,8 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
-    "testEnvironment": "node",
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testEnvironment": "jsdom",
+    "testRegex": "(/test/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -104,7 +104,6 @@
   "dependencies": {
     "@ledgerhq/hw-transport-u2f": "^4.61.0",
     "@ledgerhq/hw-transport-webusb": "^4.61.0",
-    "@lunie/cosmos-keys": "^0.0.9",
     "ledger-cosmos-js": "^2.0.2",
     "secp256k1": "^3.7.0",
     "semver": "^6.1.0"
