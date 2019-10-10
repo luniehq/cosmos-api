@@ -198,6 +198,9 @@ export default function Getters (cosmosRESTURL) {
     proposal: function (proposalId) {
       return get(`/gov/proposals/${proposalId}`)
     },
+    proposer: function (proposalId) {
+      return get(`/gov/proposals/${proposalId}/proposer`)
+    },
     proposalVotes: function (proposalId) {
       return get(`/gov/proposals/${proposalId}/votes`)
     },
