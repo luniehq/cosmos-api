@@ -1,1 +1,0 @@
-[Fixed] Fix api.get.tx(hash) not working because of an unhandled response format @faboweb

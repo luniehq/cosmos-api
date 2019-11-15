@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.2.2] - 2019-11-15
+
+### Fixed
+
+- Fix api.get.tx(hash) not working because of an unhandled response format @faboweb
+
 ## [0.2.1] - 2019-08-23
 
 ### Changed
