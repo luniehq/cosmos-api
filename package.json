@@ -104,7 +104,7 @@
   "dependencies": {
     "@ledgerhq/hw-transport-u2f": "^4.61.0",
     "@ledgerhq/hw-transport-webusb": "^4.61.0",
-    "ledger-cosmos-js": "^2.0.2",
+    "ledger-cosmos-js": "^2.1.4",
     "secp256k1": "^3.7.0",
     "semver": "^6.1.0"
   }

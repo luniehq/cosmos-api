@@ -1,8 +1,11 @@
-import { cosmosApp as App, getBech32FromPK } from 'ledger-cosmos-js'
+import { default as CosmosLedgerApp } from 'ledger-cosmos-js'
 
 import { signatureImport } from 'secp256k1'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 const semver = require('semver')
+import * as crypto from 'crypto'
+import * as Ripemd160 from 'ripemd160'
+import * as bech32 from 'bech32'
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
 const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
@@ -79,8 +82,7 @@ export default class Ledger {
 
     let transport = await TransportU2F.create(timeout * 1000)
 
-    const cosmosLedgerApp = new App(transport)
-
+    const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
 
     await this.isSendingData()
@@ -130,7 +132,8 @@ export default class Ledger {
     await this.connect()
 
     const pubKey = await this.getPubKey()
-    return getBech32FromPK(this.hrp, pubKey)
+    const res = await getBech32FromPK(this.hrp, pubKey)
+    return res
   }
 
   // triggers a confirmation request of the cosmos address on the Ledger device
@@ -211,4 +214,17 @@ export const checkAppMode = (testModeAllowed: Boolean, testMode: Boolean) => {
       `DANGER: The Cosmos Ledger app is in test mode and shouldn't be used on mainnet!`
     )
   }
+}
+
+// doesn't properly work in ledger-cosmos-js
+function getBech32FromPK(hrp, pk) {
+  if (pk.length !== 33) {
+    throw new Error('expected compressed public key [31 bytes]')
+  }
+  const hashSha256 = crypto
+    .createHash('sha256')
+    .update(pk)
+    .digest()
+  const hashRip = new Ripemd160().update(hashSha256).digest()
+  return bech32.encode(hrp, bech32.toWords(hashRip))
 }

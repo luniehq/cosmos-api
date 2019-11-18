@@ -32,7 +32,7 @@ describe(`Ledger`, () => {
     it('connects', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        cosmosApp: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
@@ -75,7 +75,7 @@ describe(`Ledger`, () => {
     it("fails if can't get data from device", async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        cosmosApp: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'BIG ERROR'
@@ -92,7 +92,7 @@ describe(`Ledger`, () => {
     it('fails if Cosmos App is outdated', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        cosmosApp: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
@@ -120,7 +120,7 @@ describe(`Ledger`, () => {
     it('fails if Ledger device is locked', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors',
