@@ -1,4 +1,4 @@
-import App from 'ledger-cosmos-js'
+import { default as CosmosLedgerApp } from 'ledger-cosmos-js'
 
 import { signatureImport } from 'secp256k1'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
@@ -82,7 +82,7 @@ export default class Ledger {
 
     let transport = await TransportU2F.create(timeout * 1000)
 
-    const cosmosLedgerApp = new App(transport)
+    const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
 
     await this.isSendingData()
