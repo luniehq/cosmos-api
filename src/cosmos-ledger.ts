@@ -50,15 +50,6 @@ export default class Ledger {
     return this
   }
 
-  // check if the connection we established with the Ledger device is working
-  private async isSendingData() {
-    // check if the device is connected or on screensaver mode
-    const response = await this.cosmosApp.publicKey(this.hdPath)
-    this.checkLedgerErrors(response, {
-      timeoutMessag: 'Could not find a connected and unlocked Ledger device'
-    })
-  }
-
   // check if the Ledger device is ready to receive signing requests
   private async isReady() {
     // check if the version is supported
@@ -68,6 +59,9 @@ export default class Ledger {
       const msg = `Outdated version: Please update Ledger Cosmos App to the latest version.`
       throw new Error(msg)
     }
+
+    const response = await this.cosmosApp.getVersion()
+    this.checkLedgerErrors(response)
 
     // throws if not open
     await this.isCosmosAppOpen()
@@ -85,7 +79,7 @@ export default class Ledger {
     const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
 
-    await this.isSendingData()
+    // checks if the Ledger is connected and the app is open
     await this.isReady()
 
     return this
@@ -107,15 +101,26 @@ export default class Ledger {
   // checks if the cosmos app is open
   // to be used for a nicer UX
   async isCosmosAppOpen() {
+    const response = await this.cosmosApp.deviceInfo()
+    this.checkLedgerErrors(response)
+    // if (appName.toLowerCase() === `dashboard`) {
+    //   throw new Error(`Please open the Cosmos app.`)
+    // }
+
+    const appName = await this.getOpenApp()
+    if (appName.toLowerCase() !== `cosmos`) {
+      throw new Error(`Close ${appName} and open the Cosmos app`)
+    }
+  }
+
+  async getOpenApp() {
     await this.connect()
 
     const response = await this.cosmosApp.appInfo()
     this.checkLedgerErrors(response)
     const { appName } = response
 
-    if (appName.toLowerCase() !== `cosmos`) {
-      throw new Error(`Close ${appName} and open the Cosmos app`)
-    }
+    return appName
   }
 
   // returns the public key from the Ledger device as a Buffer
@@ -196,8 +201,10 @@ export default class Ledger {
       case `No errors`:
         // do nothing
         break
+      case `TransportError: Failed to sign with Ledger device: U2F DEVICE_INELIGIBLE`:
+        new Error(`Couldn't connect to Ledger. Is you Ledger connected and the Cosmos App open?`)
       default:
-        throw new Error(error_message)
+        throw new Error(`Ledger Native Error: ${error_message}`)
     }
   }
 }
