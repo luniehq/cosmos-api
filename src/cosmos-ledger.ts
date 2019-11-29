@@ -1,7 +1,6 @@
 import { default as CosmosLedgerApp } from 'ledger-cosmos-js'
 
 import { signatureImport } from 'secp256k1'
-import TransportU2F from '@ledgerhq/hw-transport-u2f'
 const semver = require('semver')
 import * as crypto from 'crypto'
 import * as Ripemd160 from 'ripemd160'
@@ -74,7 +73,14 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    let transport = await TransportU2F.create(timeout * 1000)
+    let transport
+    if (navigator.hid) {
+      const TransportWebHID = await import('@ledgerhq/hw-transport-webhid')
+      transport = await TransportWebHID.create(timeout * 1000)
+    } else {
+      const TransportU2F = await import('@ledgerhq/hw-transport-u2f')
+      transport = await TransportU2F.create(timeout * 1000)
+    }
 
     const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
