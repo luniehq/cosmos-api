@@ -4,7 +4,12 @@ jest.mock('secp256k1', () => ({
   signatureImport: () => Buffer.from('1234')
 }))
 
-jest.mock('@ledgerhq/hw-transport-u2f', () => ({
+jest.mock('@ledgerhq/hw-transport-webusb', () => ({
+  default: {
+    create: async () => ({})
+  }
+}))
+jest.mock('@ledgerhq/hw-transport-webhid', () => ({
   default: {
     create: async () => ({})
   }
