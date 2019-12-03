@@ -94,6 +94,19 @@ describe(`Ledger`, () => {
       expect(TransportWebHID.default.create).toHaveBeenCalled()
     })
 
+    it(`fails if trying to use the lib on a browser that doesn't support Ledgers`, async () => {
+      ledger.userAgent = 'ie'
+      await expect(ledger.connect()).rejects.toThrowError(
+        "Your browser doesn't support Ledger devices."
+      )
+    })
+
+    it(`works on Brave`, async () => {
+      ledger.userAgent = 'chrome'
+      window.google = {}
+      await expect(ledger.connect()).resolves
+    })
+
     it('uses existing connection', async () => {
       const self = {
         isSendingData: jest.fn(),
