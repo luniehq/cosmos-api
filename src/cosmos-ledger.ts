@@ -212,8 +212,6 @@ export default class Ledger {
       case `No errors`:
         // do nothing
         break
-      case `TransportError: Failed to sign with Ledger device: U2F DEVICE_INELIGIBLE`:
-        new Error(`Couldn't connect to Ledger. Is you Ledger connected and the Cosmos App open?`)
       default:
         throw new Error(`Ledger Native Error: ${error_message}`)
     }
