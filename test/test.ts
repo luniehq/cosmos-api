@@ -4,6 +4,7 @@ declare global {
   interface Navigator {
     platform: string
     hid: Object
+    userAgent: string
   }
 }
 
@@ -30,6 +31,7 @@ describe(`Ledger`, () => {
   let ledger: Ledger
   beforeEach(() => {
     ledger = new Ledger(config)
+    ledger.userAgent = 'chrome'
   })
 
   it('testDevice', async () => {
@@ -54,7 +56,7 @@ describe(`Ledger`, () => {
             return {
               major: '1',
               minor: '5',
-              patch: '0',
+              patch: '5',
               test_mode: false,
               error_message: 'No errors'
             }
@@ -69,6 +71,7 @@ describe(`Ledger`, () => {
       }))
       const Ledger = require('../src/cosmos-ledger').default
       ledger = new Ledger(config)
+      ledger.userAgent = 'chrome'
       await ledger.connect()
     })
 
@@ -85,6 +88,7 @@ describe(`Ledger`, () => {
       ledger = new Ledger(config)
       window.navigator.hid = { enabled: true }
       ledger.platform = 'Windows'
+      ledger.userAgent = 'chrome'
       await ledger.connect()
 
       expect(TransportWebHID.default.create).toHaveBeenCalled()
@@ -115,6 +119,7 @@ describe(`Ledger`, () => {
       }))
       const Ledger = require('../src/cosmos-ledger')
       ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow('BIG ERROR')
     })
@@ -141,6 +146,7 @@ describe(`Ledger`, () => {
       }))
       const Ledger = require('../src/cosmos-ledger')
       ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow(
         'Outdated version: Please update Ledger Cosmos App to the latest version.'
@@ -161,6 +167,7 @@ describe(`Ledger`, () => {
       }))
       const Ledger = require('../src/cosmos-ledger')
       ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow('')
     })
@@ -296,7 +303,7 @@ describe(`Ledger`, () => {
       const self = {
         checkLedgerErrors: jest.fn(),
         connect: jest.fn(),
-        getCosmosAppVersion: () => '1.5.0',
+        getCosmosAppVersion: () => '1.5.5',
         cosmosApp: {
           getAddressAndPubKey: jest.fn(() => ({
             error_message: 'No errors'

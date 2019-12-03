@@ -33,6 +33,7 @@ export default class Ledger {
   private hdPath: Array<number>
   private hrp: string
   public platform: string
+  public userAgent: string
 
   constructor(
     { testModeAllowed = false }: { testModeAllowed: Boolean } = { testModeAllowed: false },
@@ -43,6 +44,7 @@ export default class Ledger {
     this.hdPath = hdPath
     this.hrp = hrp
     this.platform = navigator.platform // set it here to overwrite in tests
+    this.userAgent = window.navigator.userAgent // set it here to overwrite in tests
   }
 
   // quickly test connection and compatibility with the Ledger device throwing away the connection
@@ -76,7 +78,7 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    const browser = getBrowser()
+    const browser = getBrowser(this.userAgent)
 
     let transport
     if (isWindows(this.platform)) {
@@ -263,8 +265,8 @@ function isWindows(platform) {
   return platform.indexOf('Win') > -1
 }
 
-function getBrowser() {
-  const ua = window.navigator.userAgent.toLowerCase()
+function getBrowser(userAgent) {
+  const ua = userAgent.toLowerCase()
   const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
   const isBrave = isChrome && !window.google
 
