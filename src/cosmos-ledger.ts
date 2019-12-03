@@ -16,7 +16,7 @@ declare global {
     opr: any
   }
   interface Navigator {
-    hid: Boolean
+    hid: Object
   }
 }
 
@@ -32,6 +32,8 @@ export default class Ledger {
   private cosmosApp: any
   private hdPath: Array<number>
   private hrp: string
+  public platform: string
+
   constructor(
     { testModeAllowed = false }: { testModeAllowed: Boolean } = { testModeAllowed: false },
     hdPath: Array<number> = HDPATH,
@@ -40,6 +42,7 @@ export default class Ledger {
     this.testModeAllowed = testModeAllowed
     this.hdPath = hdPath
     this.hrp = hrp
+    this.platform = navigator.platform // set it here to overwrite in tests
   }
 
   // quickly test connection and compatibility with the Ledger device throwing away the connection
@@ -74,7 +77,7 @@ export default class Ledger {
     if (this.cosmosApp) return this
 
     let transport
-    if (isWindows()) {
+    if (isWindows(this.platform)) {
       if (!navigator.hid) {
         throw new Error(
           "Your browser doesn't have HID enabled. Please enable 'Experimental Web Platform features' here: chrome://flags / brave://flags"
@@ -246,6 +249,6 @@ function getBech32FromPK(hrp, pk) {
   return bech32.encode(hrp, bech32.toWords(hashRip))
 }
 
-function isWindows() {
-  return navigator.platform.indexOf('Win') > -1
+function isWindows(platform) {
+  return platform.indexOf('Win') > -1
 }

@@ -1,5 +1,12 @@
 import Ledger from '../src/cosmos-ledger'
 
+declare global {
+  interface Navigator {
+    platform: string
+    hid: Object
+  }
+}
+
 jest.mock('secp256k1', () => ({
   signatureImport: () => Buffer.from('1234')
 }))
@@ -63,6 +70,24 @@ describe(`Ledger`, () => {
       const Ledger = require('../src/cosmos-ledger').default
       ledger = new Ledger(config)
       await ledger.connect()
+    })
+
+    it(`uses WebHID on Windows`, async () => {
+      jest.resetModules()
+      jest.doMock('@ledgerhq/hw-transport-webhid', () => ({
+        default: {
+          create: jest.fn()
+        }
+      }))
+      const TransportWebHID = require('@ledgerhq/hw-transport-webhid')
+      const Ledger = require('../src/cosmos-ledger').default
+
+      ledger = new Ledger(config)
+      window.navigator.hid = { enabled: true }
+      ledger.platform = 'Windows'
+      await ledger.connect()
+
+      expect(TransportWebHID.default.create).toHaveBeenCalled()
     })
 
     it('uses existing connection', async () => {
