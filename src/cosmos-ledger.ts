@@ -133,10 +133,10 @@ export default class Ledger {
     const appName = await this.getOpenApp()
 
     if (appName.toLowerCase() === `dashboard`) {
-      throw new Error(`Please open the Cosmos app.`)
+      throw new Error(`Please open the Cosmos Ledger app on your Ledger device.`)
     }
     if (appName.toLowerCase() !== `cosmos`) {
-      throw new Error(`Close ${appName} and open the Cosmos app`)
+      throw new Error(`Please close ${appName} and open the Cosmos Ledger app on your Ledger device.`)
     }
   }
 
