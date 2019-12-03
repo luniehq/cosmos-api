@@ -84,7 +84,7 @@ export default class Ledger {
     if (isWindows(this.platform)) {
       if (!navigator.hid) {
         throw new Error(
-          `Your browser doesn't have HID enabled. Please enable the feature by visiting following URL: ${browser}://flags/#enable-experimental-web-platform-features`
+          `Your browser doesn't have HID enabled. Please enable this feature by visiting: ${browser}://flags/#enable-experimental-web-platform-features`
         )
       }
 
@@ -99,7 +99,7 @@ export default class Ledger {
       } catch (err) {
         if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
           throw new Error(
-            "Couldn't connect to a Ledger. You have a Ledger plugged in? Maybe it is outdated. Lunie requires at least FW 1.5.5 or later. You can use Ledger Live to update."
+            "Couldn't connect to a Ledger device. Please use Ledger Live to upgrade the Ledger firmware to version 1.5.5 or later."
           )
         }
       }
