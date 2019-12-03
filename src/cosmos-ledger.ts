@@ -13,6 +13,7 @@ declare global {
   interface Window {
     chrome: any
     opr: any
+    google: any
   }
   interface Navigator {
     hid: Object
