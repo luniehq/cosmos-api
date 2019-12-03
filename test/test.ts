@@ -81,7 +81,7 @@ describe(`Ledger`, () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
         default: class MockApp {
-          publicKey() {
+          getVersion() {
             return {
               error_message: 'BIG ERROR'
             }
@@ -210,7 +210,8 @@ describe(`Ledger`, () => {
             error_message: 'No errors'
           })
         },
-        checkLedgerErrors: jest.fn()
+        checkLedgerErrors: jest.fn(),
+        getOpenApp: ledger.getOpenApp
       }
       await ledger.isCosmosAppOpen.call(self)
       expect(self.connect).toHaveBeenCalled()
@@ -226,7 +227,8 @@ describe(`Ledger`, () => {
             error_message: 'No errors'
           })
         },
-        checkLedgerErrors: jest.fn()
+        checkLedgerErrors: jest.fn(),
+        getOpenApp: ledger.getOpenApp
       }
       await expect(ledger.isCosmosAppOpen.call(self)).rejects.toThrow()
       expect(self.connect).toHaveBeenCalled()

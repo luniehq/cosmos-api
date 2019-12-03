@@ -115,13 +115,11 @@ export default class Ledger {
   // checks if the cosmos app is open
   // to be used for a nicer UX
   async isCosmosAppOpen() {
-    const response = await this.cosmosApp.deviceInfo()
-    this.checkLedgerErrors(response)
-    // if (appName.toLowerCase() === `dashboard`) {
-    //   throw new Error(`Please open the Cosmos app.`)
-    // }
-
     const appName = await this.getOpenApp()
+
+    if (appName.toLowerCase() === `dashboard`) {
+      throw new Error(`Please open the Cosmos app.`)
+    }
     if (appName.toLowerCase() !== `cosmos`) {
       throw new Error(`Close ${appName} and open the Cosmos app`)
     }
