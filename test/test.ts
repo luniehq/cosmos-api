@@ -31,7 +31,10 @@ describe(`Ledger`, () => {
   let ledger: Ledger
   beforeEach(() => {
     ledger = new Ledger(config)
+
+    // mimic Chrome
     ledger.userAgent = 'chrome'
+    window.google = {}
   })
 
   it('testDevice', async () => {
@@ -103,7 +106,7 @@ describe(`Ledger`, () => {
 
     it(`works on Brave`, async () => {
       ledger.userAgent = 'chrome'
-      window.google = {}
+      window.google = undefined
       await expect(ledger.connect()).resolves
     })
 

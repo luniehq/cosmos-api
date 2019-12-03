@@ -136,7 +136,9 @@ export default class Ledger {
       throw new Error(`Please open the Cosmos Ledger app on your Ledger device.`)
     }
     if (appName.toLowerCase() !== `cosmos`) {
-      throw new Error(`Please close ${appName} and open the Cosmos Ledger app on your Ledger device.`)
+      throw new Error(
+        `Please close ${appName} and open the Cosmos Ledger app on your Ledger device.`
+      )
     }
   }
 
@@ -274,6 +276,6 @@ function getBrowser(userAgent) {
     throw new Error("Your browser doesn't support Ledger devices.")
   }
 
-  if (isChrome) return 'chrome'
   if (isBrave) return 'brave'
+  if (isChrome) return 'chrome'
 }
