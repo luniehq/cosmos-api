@@ -7,8 +7,7 @@ import * as Ripemd160 from 'ripemd160'
 import * as bech32 from 'bech32'
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
-const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
-// const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
+const REQUIRED_COSMOS_APP_VERSION = '1.5.5'
 
 declare global {
   interface Window {
@@ -89,8 +88,16 @@ export default class Ledger {
     }
     // OSX / Linux
     else {
-      const { default: TransportWebUSB } = await import('@ledgerhq/hw-transport-webusb')
-      transport = await TransportWebUSB.create(timeout * 1000)
+      try {
+        const { default: TransportWebUSB } = await import('@ledgerhq/hw-transport-webusb')
+        transport = await TransportWebUSB.create(timeout * 1000)
+      } catch (err) {
+        if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
+          throw new Error(
+            "Couldn't connect to a Ledger. You have a Ledger plugged in? Maybe it is outdated. Lunie requires at least FW 1.5.5 or later. You can use Ledger Live to update."
+          )
+        }
+      }
     }
 
     const cosmosLedgerApp = new CosmosLedgerApp(transport)
