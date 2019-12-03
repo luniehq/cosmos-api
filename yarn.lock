@@ -300,15 +300,6 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@ledgerhq/devices@^4.74.0":
-  version "4.74.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.74.0.tgz#854a2ffeceb1156f42e241cd4fd0cf6479239b97"
-  integrity sha512-aodKrqs6XQeGAb2iLdoKdVWgUV1MhJpPARxBE65XN8Bx19DQSIZhNypUb0nc4HDbYdSA+7m3+GQEfasL0vt4dg==
-  dependencies:
-    "@ledgerhq/errors" "^4.74.0"
-    "@ledgerhq/logs" "^4.72.0"
-    rxjs "^6.5.3"
-
 "@ledgerhq/devices@^4.78.0":
   version "4.78.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.78.0.tgz#149b572f0616096e2bd5eb14ce14d0061c432be6"
@@ -318,25 +309,10 @@
     "@ledgerhq/logs" "^4.72.0"
     rxjs "^6.5.3"
 
-"@ledgerhq/errors@^4.74.0":
-  version "4.74.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.74.0.tgz#7332da60c891866631c813003395b07803e148ee"
-  integrity sha512-haOIbBE51T0eNNQhXWkDoDocblesK4XN2Q3OHqtx3mntox0CclmFwyU7mkh9B+RE1Gnm6dQMTZky67WZGzNNOQ==
-
 "@ledgerhq/errors@^4.78.0":
   version "4.78.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.78.0.tgz#23daf3af54d03b1bda3e616002b555da1bdb705a"
   integrity sha512-FX6zHZeiNtegBvXabK6M5dJ+8OV8kQGGaGtuXDeK/Ss5EmG4Ltxc6Lnhe8hiHpm9pCHtktOsnUVL7IFBdHhYUg==
-
-"@ledgerhq/hw-transport-u2f@^4.61.0":
-  version "4.74.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.74.0.tgz#20ee8d2869e1e942ee8ff724d6fd271ed48a7146"
-  integrity sha512-CKk2Qb5/+khssxPY/1rfuwe5VkQWk7RaURqGKHwNo8YjCoIt6PxVAxJsKC+4uG5OrGp7KChJnSOtgPQQ/9Hkqw==
-  dependencies:
-    "@ledgerhq/errors" "^4.74.0"
-    "@ledgerhq/hw-transport" "^4.74.0"
-    "@ledgerhq/logs" "^4.72.0"
-    u2f-api "0.2.7"
 
 "@ledgerhq/hw-transport-webhid@^4.78.0":
   version "4.78.0"
@@ -348,24 +324,15 @@
     "@ledgerhq/hw-transport" "^4.78.0"
     "@ledgerhq/logs" "^4.72.0"
 
-"@ledgerhq/hw-transport-webusb@^4.61.0":
-  version "4.74.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-webusb/-/hw-transport-webusb-4.74.0.tgz#87eafefe6c4ed18d259b324506eff8e3edc26667"
-  integrity sha512-Bil1rQp9bBYy3BO0DSj79IPvFqqSUOXSHxatEhUK+BFQltxIlsPi0EhnRSQse/w+XFmgDophaahRlUvNLVz4Bg==
+"@ledgerhq/hw-transport-webusb@^4.78.0":
+  version "4.78.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-webusb/-/hw-transport-webusb-4.78.0.tgz#821903d7f0366ee599235e6ef5730cdd754f63d6"
+  integrity sha512-od5dp15PDYamlcJci5mD1TgjN0gva3ed1eZ0oXd4/CJwAz5Q+IoyTZnVq03UX1U+0ShF5QqnqAMxsK4YWkVwsw==
   dependencies:
-    "@ledgerhq/devices" "^4.74.0"
-    "@ledgerhq/errors" "^4.74.0"
-    "@ledgerhq/hw-transport" "^4.74.0"
+    "@ledgerhq/devices" "^4.78.0"
+    "@ledgerhq/errors" "^4.78.0"
+    "@ledgerhq/hw-transport" "^4.78.0"
     "@ledgerhq/logs" "^4.72.0"
-
-"@ledgerhq/hw-transport@^4.74.0":
-  version "4.74.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.74.0.tgz#1422b613efd1dc061596b39ba2b2577b73a0c3c0"
-  integrity sha512-ofJK0v1DJl7GDu5dxQ97GBf21PRcVtV2SI/tEVNGSi61eUQKDi715Exzr8HTRMPAOyc9IwlDXNr0agJQIw0T/Q==
-  dependencies:
-    "@ledgerhq/devices" "^4.74.0"
-    "@ledgerhq/errors" "^4.74.0"
-    events "^3.0.0"
 
 "@ledgerhq/hw-transport@^4.77.0", "@ledgerhq/hw-transport@^4.78.0":
   version "4.78.0"
@@ -5601,11 +5568,6 @@ typescript@3.7.x, typescript@^3.0.3:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.2.tgz#27e489b95fa5909445e9fef5ee48d81697ad18fb"
   integrity sha512-ml7V7JfiN2Xwvcer+XAf2csGO1bPBdRbFCkYBczNZggrBZ9c7G3riSUeJmqEU5uOtXNPMhE3n+R4FA/3YOAWOQ==
-
-u2f-api@0.2.7:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/u2f-api/-/u2f-api-0.2.7.tgz#17bf196b242f6bf72353d9858e6a7566cc192720"
-  integrity sha512-fqLNg8vpvLOD5J/z4B6wpPg4Lvowz1nJ9xdHcCzdUPKcFE/qNCceV2gNZxSJd5vhAZemHr/K/hbzVA0zxB5mkg==
 
 uglify-js@^3.1.4:
   version "3.6.9"

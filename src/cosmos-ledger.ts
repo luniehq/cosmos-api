@@ -59,9 +59,6 @@ export default class Ledger {
       throw new Error(msg)
     }
 
-    const response = await this.cosmosApp.getVersion()
-    this.checkLedgerErrors(response)
-
     // throws if not open
     await this.isCosmosAppOpen()
   }
@@ -74,12 +71,20 @@ export default class Ledger {
     if (this.cosmosApp) return this
 
     let transport
-    if (navigator.hid) {
-      const TransportWebHID = await import('@ledgerhq/hw-transport-webhid')
+    if (isWindows()) {
+      if (!navigator.hid) {
+        throw new Error(
+          "Your browser doesn't have HID enabled. Please enable 'Experimental Web Platform features' here: chrome://flags / brave://flags"
+        )
+      }
+
+      const { default: TransportWebHID } = await import('@ledgerhq/hw-transport-webhid')
       transport = await TransportWebHID.create(timeout * 1000)
-    } else {
-      const TransportU2F = await import('@ledgerhq/hw-transport-u2f')
-      transport = await TransportU2F.create(timeout * 1000)
+    }
+    // OSX / Linux
+    else {
+      const { default: TransportWebUSB } = await import('@ledgerhq/hw-transport-webusb')
+      transport = await TransportWebUSB.create(timeout * 1000)
     }
 
     const cosmosLedgerApp = new CosmosLedgerApp(transport)
@@ -240,4 +245,8 @@ function getBech32FromPK(hrp, pk) {
     .digest()
   const hashRip = new Ripemd160().update(hashSha256).digest()
   return bech32.encode(hrp, bech32.toWords(hashRip))
+}
+
+function isWindows() {
+  return navigator.platform.indexOf('Win') > -1
 }
