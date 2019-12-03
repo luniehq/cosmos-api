@@ -15,6 +15,9 @@ declare global {
     chrome: any
     opr: any
   }
+  interface Navigator {
+    hid: Boolean
+  }
 }
 
 /*
