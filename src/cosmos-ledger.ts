@@ -75,11 +75,13 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
+    const browser = getBrowser()
+
     let transport
     if (isWindows(this.platform)) {
       if (!navigator.hid) {
         throw new Error(
-          "Your browser doesn't have HID enabled. Please enable 'Experimental Web Platform features' here: chrome://flags / brave://flags"
+          `Your browser doesn't have HID enabled. Please enable the feature by visiting following URL: ${browser}://flags/#enable-experimental-web-platform-features`
         )
       }
 
@@ -258,4 +260,17 @@ function getBech32FromPK(hrp, pk) {
 
 function isWindows(platform) {
   return platform.indexOf('Win') > -1
+}
+
+function getBrowser() {
+  const ua = window.navigator.userAgent.toLowerCase()
+  const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
+  const isBrave = isChrome && !window.google
+
+  if (!isChrome && !isBrave) {
+    throw new Error("Your browser doesn't support Ledger devices.")
+  }
+
+  if (isChrome) return 'chrome'
+  if (isBrave) return 'brave'
 }
