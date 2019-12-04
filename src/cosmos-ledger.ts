@@ -88,17 +88,17 @@ export default class Ledger {
         )
       }
 
-      const {
-        default: TransportWebHID
-      } = require(/* webpackChunkName: "webhid" */ '@ledgerhq/hw-transport-webhid')
+      const { default: TransportWebHID } = await import(
+        /* webpackChunkName: "webhid" */ '@ledgerhq/hw-transport-webhid'
+      )
       transport = await TransportWebHID.create(timeout * 1000)
     }
     // OSX / Linux
     else {
       try {
-        const {
-          default: TransportWebUSB
-        } = require(/* webpackChunkName: "webusb" */ '@ledgerhq/hw-transport-webusb')
+        const { default: TransportWebUSB } = await import(
+          /* webpackChunkName: "webusb" */ '@ledgerhq/hw-transport-webusb'
+        )
         transport = await TransportWebUSB.create(timeout * 1000)
       } catch (err) {
         if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
