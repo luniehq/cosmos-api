@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.1.1] - 2019-12-04
+
+### Fixed
+
+- Removes webpack as it didn't work properly with lazy loading dependencies @faboweb
+
 ## [0.1.0] - 2019-12-04
 
 ### Changed
