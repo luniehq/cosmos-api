@@ -29,7 +29,7 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf lib",
-    "build": "webpack",
+    "build": "npx tsc src/cosmos-ledger.ts --outDir lib --sourceMap --declaration",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
@@ -91,15 +91,12 @@
     "prettier": "^1.14.3",
     "rimraf": "^2.6.2",
     "ts-jest": "^24.1.0",
-    "ts-loader": "^6.0.2",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.15.0",
-    "typescript": "^3.0.3",
-    "webpack": "^4.32.2",
-    "webpack-cli": "^3.3.2"
+    "typescript": "^3.0.3"
   },
   "dependencies": {
     "@ledgerhq/hw-transport-webhid": "^4.78.0",
