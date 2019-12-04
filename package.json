@@ -98,7 +98,7 @@
     "typedoc": "^0.15.0",
     "typescript": "^3.0.3"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@ledgerhq/hw-transport-webhid": "^4.78.0",
     "@ledgerhq/hw-transport-webusb": "^4.78.0",
     "ledger-cosmos-js": "^2.1.7",
