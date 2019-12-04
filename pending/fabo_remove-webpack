@@ -1,0 +1,1 @@
+[Fixed] Removes webpack as it didn't work properly with lazy loading dependencies @faboweb
