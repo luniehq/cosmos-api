@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.1.3] - 2019-12-04
+
+### Changed
+
+- Handle the case were the Ledger is already used by another tab @faboweb
+
 ## [0.1.2] - 2019-12-04
 
 ### Fixed
