@@ -88,23 +88,27 @@ export default class Ledger {
         )
       }
 
-      const { default: TransportWebHID } = await import(
-        /* webpackChunkName: "webhid" */ '@ledgerhq/hw-transport-webhid'
-      )
+      const {
+        default: TransportWebHID
+      } = require(/* webpackChunkName: "webhid" */ '@ledgerhq/hw-transport-webhid')
       transport = await TransportWebHID.create(timeout * 1000)
     }
     // OSX / Linux
     else {
       try {
-        const { default: TransportWebUSB } = await import(
-          /* webpackChunkName: "webusb" */ '@ledgerhq/hw-transport-webusb'
-        )
+        const {
+          default: TransportWebUSB
+        } = require(/* webpackChunkName: "webusb" */ '@ledgerhq/hw-transport-webusb')
         transport = await TransportWebUSB.create(timeout * 1000)
       } catch (err) {
         if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
           throw new Error(
             "Couldn't connect to a Ledger device. Please use Ledger Live to upgrade the Ledger firmware to version 1.5.5 or later."
           )
+        }
+        if (err.message.trim().startsWith('Unable to claim interface')) {
+          // apparently can't use it in several tabs in parallel
+          throw new Error('Could not access Ledger device. Do you use it in another tab?')
         }
       }
     }
