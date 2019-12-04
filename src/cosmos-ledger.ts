@@ -7,7 +7,7 @@ import * as Ripemd160 from 'ripemd160'
 import * as bech32 from 'bech32'
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
-const REQUIRED_COSMOS_APP_VERSION = '1.5.5'
+const REQUIRED_COSMOS_APP_VERSION = '1.5.3'
 
 declare global {
   interface Window {
