@@ -101,11 +101,13 @@ export default class Ledger {
         )
         transport = await TransportWebUSB.create(timeout * 1000)
       } catch (err) {
+        /* istanbul ignore next: specific error rewrite */
         if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
           throw new Error(
             "Couldn't connect to a Ledger device. Please use Ledger Live to upgrade the Ledger firmware to version 1.5.5 or later."
           )
         }
+        /* istanbul ignore next: specific error rewrite */
         if (err.message.trim().startsWith('Unable to claim interface')) {
           // apparently can't use it in several tabs in parallel
           throw new Error('Could not access Ledger device. Do you use it in another tab?')
