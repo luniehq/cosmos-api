@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.0.8] - 2019-12-04
+
+### Changed
+
+- [#13](https://github.com/cosmos/lunie/pull/13) Switched to WebHID on Windows and WebUSB on OSX/Linux @faboweb
+
 ## [0.0.7] - 2019-11-28
 
 ### Changed
