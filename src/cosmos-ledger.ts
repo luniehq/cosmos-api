@@ -1,20 +1,22 @@
 import { default as CosmosLedgerApp } from 'ledger-cosmos-js'
 
 import { signatureImport } from 'secp256k1'
-import TransportU2F from '@ledgerhq/hw-transport-u2f'
 const semver = require('semver')
 import * as crypto from 'crypto'
 import * as Ripemd160 from 'ripemd160'
 import * as bech32 from 'bech32'
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
-const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
-// const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
+const REQUIRED_COSMOS_APP_VERSION = '1.5.5'
 
 declare global {
   interface Window {
     chrome: any
     opr: any
+    google: any
+  }
+  interface Navigator {
+    hid: Object
   }
 }
 
@@ -30,6 +32,9 @@ export default class Ledger {
   private cosmosApp: any
   private hdPath: Array<number>
   private hrp: string
+  public platform: string
+  public userAgent: string
+
   constructor(
     { testModeAllowed = false }: { testModeAllowed: Boolean } = { testModeAllowed: false },
     hdPath: Array<number> = HDPATH,
@@ -38,6 +43,8 @@ export default class Ledger {
     this.testModeAllowed = testModeAllowed
     this.hdPath = hdPath
     this.hrp = hrp
+    this.platform = navigator.platform // set it here to overwrite in tests
+    this.userAgent = window.navigator.userAgent // set it here to overwrite in tests
   }
 
   // quickly test connection and compatibility with the Ledger device throwing away the connection
@@ -60,9 +67,6 @@ export default class Ledger {
       throw new Error(msg)
     }
 
-    const response = await this.cosmosApp.getVersion()
-    this.checkLedgerErrors(response)
-
     // throws if not open
     await this.isCosmosAppOpen()
   }
@@ -74,7 +78,32 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    let transport = await TransportU2F.create(timeout * 1000)
+    const browser = getBrowser(this.userAgent)
+
+    let transport
+    if (isWindows(this.platform)) {
+      if (!navigator.hid) {
+        throw new Error(
+          `Your browser doesn't have HID enabled. Please enable this feature by visiting: ${browser}://flags/#enable-experimental-web-platform-features`
+        )
+      }
+
+      const { default: TransportWebHID } = await import('@ledgerhq/hw-transport-webhid')
+      transport = await TransportWebHID.create(timeout * 1000)
+    }
+    // OSX / Linux
+    else {
+      try {
+        const { default: TransportWebUSB } = await import('@ledgerhq/hw-transport-webusb')
+        transport = await TransportWebUSB.create(timeout * 1000)
+      } catch (err) {
+        if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
+          throw new Error(
+            "Couldn't connect to a Ledger device. Please use Ledger Live to upgrade the Ledger firmware to version 1.5.5 or later."
+          )
+        }
+      }
+    }
 
     const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
@@ -101,15 +130,15 @@ export default class Ledger {
   // checks if the cosmos app is open
   // to be used for a nicer UX
   async isCosmosAppOpen() {
-    const response = await this.cosmosApp.deviceInfo()
-    this.checkLedgerErrors(response)
-    // if (appName.toLowerCase() === `dashboard`) {
-    //   throw new Error(`Please open the Cosmos app.`)
-    // }
-
     const appName = await this.getOpenApp()
+
+    if (appName.toLowerCase() === `dashboard`) {
+      throw new Error(`Please open the Cosmos Ledger app on your Ledger device.`)
+    }
     if (appName.toLowerCase() !== `cosmos`) {
-      throw new Error(`Close ${appName} and open the Cosmos app`)
+      throw new Error(
+        `Please close ${appName} and open the Cosmos Ledger app on your Ledger device.`
+      )
     }
   }
 
@@ -201,8 +230,6 @@ export default class Ledger {
       case `No errors`:
         // do nothing
         break
-      case `TransportError: Failed to sign with Ledger device: U2F DEVICE_INELIGIBLE`:
-        new Error(`Couldn't connect to Ledger. Is you Ledger connected and the Cosmos App open?`)
       default:
         throw new Error(`Ledger Native Error: ${error_message}`)
     }
@@ -234,4 +261,21 @@ function getBech32FromPK(hrp, pk) {
     .digest()
   const hashRip = new Ripemd160().update(hashSha256).digest()
   return bech32.encode(hrp, bech32.toWords(hashRip))
+}
+
+function isWindows(platform) {
+  return platform.indexOf('Win') > -1
+}
+
+function getBrowser(userAgent) {
+  const ua = userAgent.toLowerCase()
+  const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
+  const isBrave = isChrome && !window.google
+
+  if (!isChrome && !isBrave) {
+    throw new Error("Your browser doesn't support Ledger devices.")
+  }
+
+  if (isBrave) return 'brave'
+  if (isChrome) return 'chrome'
 }
