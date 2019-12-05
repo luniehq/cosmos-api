@@ -114,7 +114,6 @@ export default class Ledger {
         }
         /* istanbul ignore next: specific error rewrite */
         if (err.message.trim().startsWith('Not supported')) {
-          // apparently can't use it in several tabs in parallel
           throw new Error(
             "Your browser doesn't support WebUSB yet. Try updating it to the latest version."
           )
