@@ -110,7 +110,13 @@ export default class Ledger {
         /* istanbul ignore next: specific error rewrite */
         if (err.message.trim().startsWith('Unable to claim interface')) {
           // apparently can't use it in several tabs in parallel
-          throw new Error('Could not access Ledger device. Do you use it in another tab?')
+          throw new Error('Could not access Ledger device. Is it being used in another tab?')
+        }
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('Not supported')) {
+          throw new Error(
+            "Your browser doesn't support WebUSB yet. Try updating it to the latest version."
+          )
         }
       }
     }
