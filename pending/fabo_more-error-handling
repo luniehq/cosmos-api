@@ -1,1 +1,2 @@
 [Added] Handle outdated browser error @faboweb
+[Fixed] Show correct feature flag URL for HID support @faboweb
