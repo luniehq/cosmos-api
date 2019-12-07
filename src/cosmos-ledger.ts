@@ -78,13 +78,11 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    const browser = getBrowser(this.userAgent)
-
     let transport
-    if (isWindows(this.platform)) {
+    if (true) {
       if (!navigator.hid) {
         throw new Error(
-          `Your browser doesn't have HID enabled. Please enable this feature by visiting: ${browser}://flags/#enable-experimental-web-platform-features`
+          `Your browser doesn't have HID enabled. Please enable this feature by visiting: chrome://flags/#enable-experimental-web-platform-features`
         )
       }
 
@@ -117,6 +115,13 @@ export default class Ledger {
           // apparently can't use it in several tabs in parallel
           throw new Error(
             "Your browser doesn't seem to support WebUSB yet. Try updating it to the latest version."
+          )
+        }
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('No device selected')) {
+          // apparently can't use it in several tabs in parallel
+          throw new Error(
+            "You did not select a Ledger device. If you didn't see your Ledger, check if the Ledger is plugged in and unlocked."
           )
         }
       }
@@ -278,21 +283,4 @@ function getBech32FromPK(hrp, pk) {
     .digest()
   const hashRip = new Ripemd160().update(hashSha256).digest()
   return bech32.encode(hrp, bech32.toWords(hashRip))
-}
-
-function isWindows(platform) {
-  return platform.indexOf('Win') > -1
-}
-
-function getBrowser(userAgent) {
-  const ua = userAgent.toLowerCase()
-  const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
-  const isBrave = isChrome && !window.google
-
-  if (!isChrome && !isBrave) {
-    throw new Error("Your browser doesn't support Ledger devices.")
-  }
-
-  if (isBrave) return 'brave'
-  if (isChrome) return 'chrome'
 }
