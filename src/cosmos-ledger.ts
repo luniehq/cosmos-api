@@ -79,7 +79,7 @@ export default class Ledger {
     if (this.cosmosApp) return this
 
     let transport
-    if (true) {
+    if (isWindows(this.platform)) {
       if (!navigator.hid) {
         throw new Error(
           `Your browser doesn't have HID enabled. Please enable this feature by visiting: chrome://flags/#enable-experimental-web-platform-features`
@@ -283,4 +283,8 @@ function getBech32FromPK(hrp, pk) {
     .digest()
   const hashRip = new Ripemd160().update(hashSha256).digest()
   return bech32.encode(hrp, bech32.toWords(hashRip))
+}
+
+function isWindows(platform) {
+  return platform.indexOf('Win') > -1
 }
