@@ -78,6 +78,9 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
+    // check if browser is supported
+    getBrowser(this.userAgent)
+
     let transport
     if (isWindows(this.platform)) {
       if (!navigator.hid) {
@@ -112,8 +115,9 @@ export default class Ledger {
         }
         /* istanbul ignore next: specific error rewrite */
         if (err.message.trim().startsWith('Not supported')) {
+          // apparently can't use it in several tabs in parallel
           throw new Error(
-            "Your browser doesn't support WebUSB yet. Try updating it to the latest version."
+            "Your browser doesn't seem to support WebUSB yet. Try updating it to the latest version."
           )
         }
         /* istanbul ignore next: specific error rewrite */
@@ -286,4 +290,17 @@ function getBech32FromPK(hrp, pk) {
 
 function isWindows(platform) {
   return platform.indexOf('Win') > -1
+}
+
+function getBrowser(userAgent) {
+  const ua = userAgent.toLowerCase()
+  const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
+  const isBrave = isChrome && !window.google
+
+  if (!isChrome && !isBrave) {
+    throw new Error("Your browser doesn't support Ledger devices.")
+  }
+
+  if (isBrave) return 'brave'
+  if (isChrome) return 'chrome'
 }
