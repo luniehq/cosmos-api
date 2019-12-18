@@ -1,13 +1,12 @@
 {
   "name": "@lunie/cosmos-api",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Cosmos API is a library for interacting with applications built on the Cosmos SDK.",
   "main": "lib/cosmos.js",
   "scripts": {
     "test": "jest",
     "lint": "eslint src/* --fix",
     "build": "webpack",
-    "prepublishOnly": "git checkout master && npm run build",
     "log": "simsala log",
     "release": "git checkout develop & git pull & git push origin develop:release"
   },
