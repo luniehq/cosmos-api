@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.2.3] - 2019-12-18
+
+### Fixed
+
+- [#24](https://github.com/cosmos/lunie/pull/24) Fix 'window is undefined' bug for UMD @colw
+
 ## [0.2.2] - 2019-11-15
 
 ### Fixed
