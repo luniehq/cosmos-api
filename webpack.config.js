@@ -7,6 +7,7 @@ const config = {
     library: 'cosmos-js',
     libraryTarget: 'umd',
     umdNamedDefine: true,
+    globalObject: "this"
   },
   module: {
     rules: [
