@@ -3,7 +3,7 @@ Cosmos API is a library for interacting with applications built on the Cosmos SD
 
 ## Install
 
-```
+```bash
 yarn add @lunie/cosmos-js
 ```
 
@@ -11,7 +11,7 @@ yarn add @lunie/cosmos-js
 
 Simple example of how to send tokens.
 
-```
+```javascript
 import Cosmos from "@lunie/cosmos-js"
 
 const STARGATE_URL = "https://stargate.cosmos.network"
@@ -20,7 +20,7 @@ const cosmos = Cosmos(STARGATE_URL, ADDRESS)
 
 // create the transaction object
 const msg = cosmos
-  .MsgSend({toAddress: 'cosmos1abcd09876', amounts: [{ denom: 'stake', amount: 10 }})
+  .MsgSend({toAddress: 'cosmos1abcd09876', amounts: [{ denom: 'stake', amount: 10 }]})
 
 // estimate the needed gas amount
 const gasEstimate = await msg.simulate()
@@ -39,7 +39,7 @@ await included()
 
 If you want to query data only, you don't need to specify an address.
 
-```
+```javascript
 import { API } from "@lunie/cosmos-js"
 
 const STARGATE_URL = "https://stargate.cosmos.network"
@@ -51,7 +51,7 @@ const validators = await api.validators()
 
 ### Create a sign message to sign with on a Ledger or with any other signer
 
-```
+```javascript
 const { signWithPrivateKey } = require('@lunie/cosmos-keys');
 const { createSignMessage } = require('@lunie/cosmos-api');
 
@@ -86,7 +86,7 @@ const signature = signWithPrivateKey(signMessage, Buffer.from(wallet.privateKey,
 
 ### Create and sign a transaction from a message which then is ready to be broadcast
 
-```
+```javascript
 const { signWithPrivateKey } = require('@lunie/cosmos-keys');
 const { createSignedTransaction } = require('@lunie/cosmos-api');
 
