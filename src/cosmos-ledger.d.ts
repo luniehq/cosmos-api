@@ -18,7 +18,7 @@ declare module 'ledger-cosmos-js' {
       compressed_pk: Buffer
       error_message: string
     }
-    getAddressAndPubKey: (
+    showAddressAndPubKey: (
       bech32Prefix: string,
       hdPath: Array<Number>
     ) => {

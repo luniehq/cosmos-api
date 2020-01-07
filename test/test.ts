@@ -329,7 +329,7 @@ describe(`Ledger`, () => {
       await ledger.confirmLedgerAddress.call(self)
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).toHaveBeenCalled()
-      expect(self.cosmosApp.getAddressAndPubKey).toHaveBeenCalled()
+      expect(self.cosmosApp.showAddressAndPubKey).toHaveBeenCalled()
     })
 
     it('old version', async () => {
@@ -338,7 +338,7 @@ describe(`Ledger`, () => {
         connect: jest.fn(),
         getCosmosAppVersion: () => '1.1.0',
         cosmosApp: {
-          getAddressAndPubKey: jest.fn(() => ({
+          showAddressAndPubKey: jest.fn(() => ({
             error_message: 'No errors'
           }))
         }
@@ -346,7 +346,7 @@ describe(`Ledger`, () => {
       await ledger.confirmLedgerAddress.call(self)
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).not.toHaveBeenCalled()
-      expect(self.cosmosApp.getAddressAndPubKey).not.toHaveBeenCalled()
+      expect(self.cosmosApp.showAddressAndPubKey).not.toHaveBeenCalled()
     })
   })
 
