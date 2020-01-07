@@ -1,17 +1,22 @@
-import App from 'ledger-cosmos-js'
-import { getCosmosAddress } from '@lunie/cosmos-keys'
+import { default as CosmosLedgerApp } from 'ledger-cosmos-js'
+
 import { signatureImport } from 'secp256k1'
-import TransportU2F from '@ledgerhq/hw-transport-u2f'
 const semver = require('semver')
+import * as crypto from 'crypto'
+import * as Ripemd160 from 'ripemd160'
+import * as bech32 from 'bech32'
 
 const INTERACTION_TIMEOUT = 120 // seconds to wait for user action on Ledger, currently is always limited to 60
-const REQUIRED_COSMOS_APP_VERSION = '1.5.0'
-//const REQUIRED_LEDGER_FIRMWARE = "1.1.1"
+const REQUIRED_COSMOS_APP_VERSION = '1.5.3'
 
 declare global {
   interface Window {
     chrome: any
     opr: any
+    google: any
+  }
+  interface Navigator {
+    hid: Object
   }
 }
 
@@ -25,9 +30,21 @@ const BECH32PREFIX = `cosmos`
 export default class Ledger {
   private readonly testModeAllowed: Boolean
   private cosmosApp: any
+  private hdPath: Array<number>
+  private hrp: string
+  public platform: string
+  public userAgent: string
 
-  constructor({ testModeAllowed = false }: { testModeAllowed: Boolean }) {
+  constructor(
+    { testModeAllowed = false }: { testModeAllowed: Boolean } = { testModeAllowed: false },
+    hdPath: Array<number> = HDPATH,
+    hrp: string = BECH32PREFIX
+  ) {
     this.testModeAllowed = testModeAllowed
+    this.hdPath = hdPath
+    this.hrp = hrp
+    this.platform = navigator.platform // set it here to overwrite in tests
+    this.userAgent = navigator.userAgent // set it here to overwrite in tests
   }
 
   // quickly test connection and compatibility with the Ledger device throwing away the connection
@@ -38,15 +55,6 @@ export default class Ledger {
     this.cosmosApp = null
 
     return this
-  }
-
-  // check if the connection we established with the Ledger device is working
-  private async isSendingData() {
-    // check if the device is connected or on screensaver mode
-    const response = await this.cosmosApp.publicKey(HDPATH)
-    this.checkLedgerErrors(response, {
-      timeoutMessag: 'Could not find a connected and unlocked Ledger device'
-    })
   }
 
   // check if the Ledger device is ready to receive signing requests
@@ -70,13 +78,62 @@ export default class Ledger {
     // assume well connection if connected once
     if (this.cosmosApp) return this
 
-    let transport = await TransportU2F.create(timeout * 1000)
+    // check if browser is supported
+    getBrowser(this.userAgent)
 
-    const cosmosLedgerApp = new App(transport)
+    let transport
+    if (isWindows(this.platform)) {
+      if (!navigator.hid) {
+        throw new Error(
+          `Your browser doesn't have HID enabled. Please enable this feature by visiting: chrome://flags/#enable-experimental-web-platform-features`
+        )
+      }
 
+      const { default: TransportWebHID } = await import(
+        /* webpackChunkName: "webhid" */ '@ledgerhq/hw-transport-webhid'
+      )
+      transport = await TransportWebHID.create(timeout * 1000)
+    }
+    // OSX / Linux
+    else {
+      try {
+        const { default: TransportWebUSB } = await import(
+          /* webpackChunkName: "webusb" */ '@ledgerhq/hw-transport-webusb'
+        )
+        transport = await TransportWebUSB.create(timeout * 1000)
+      } catch (err) {
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('No WebUSB interface found for your Ledger device')) {
+          throw new Error(
+            "Couldn't connect to a Ledger device. Please use Ledger Live to upgrade the Ledger firmware to version 1.5.5 or later."
+          )
+        }
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('Unable to claim interface')) {
+          // apparently can't use it in several tabs in parallel
+          throw new Error('Could not access Ledger device. Is it being used in another tab?')
+        }
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('Not supported')) {
+          // apparently can't use it in several tabs in parallel
+          throw new Error(
+            "Your browser doesn't seem to support WebUSB yet. Try updating it to the latest version."
+          )
+        }
+        /* istanbul ignore next: specific error rewrite */
+        if (err.message.trim().startsWith('No device selected')) {
+          // apparently can't use it in several tabs in parallel
+          throw new Error(
+            "You did not select a Ledger device. If you didn't see your Ledger, check if the Ledger is plugged in and unlocked."
+          )
+        }
+      }
+    }
+
+    const cosmosLedgerApp = new CosmosLedgerApp(transport)
     this.cosmosApp = cosmosLedgerApp
 
-    await this.isSendingData()
+    // checks if the Ledger is connected and the app is open
     await this.isReady()
 
     return this
@@ -98,22 +155,33 @@ export default class Ledger {
   // checks if the cosmos app is open
   // to be used for a nicer UX
   async isCosmosAppOpen() {
+    const appName = await this.getOpenApp()
+
+    if (appName.toLowerCase() === `dashboard`) {
+      throw new Error(`Please open the Cosmos Ledger app on your Ledger device.`)
+    }
+    if (appName.toLowerCase() !== `cosmos`) {
+      throw new Error(
+        `Please close ${appName} and open the Cosmos Ledger app on your Ledger device.`
+      )
+    }
+  }
+
+  async getOpenApp() {
     await this.connect()
 
     const response = await this.cosmosApp.appInfo()
     this.checkLedgerErrors(response)
     const { appName } = response
 
-    if (appName.toLowerCase() !== `cosmos`) {
-      throw new Error(`Close ${appName} and open the Cosmos app`)
-    }
+    return appName
   }
 
   // returns the public key from the Ledger device as a Buffer
   async getPubKey() {
     await this.connect()
 
-    const response = await this.cosmosApp.publicKey(HDPATH)
+    const response = await this.cosmosApp.publicKey(this.hdPath)
     this.checkLedgerErrors(response)
     return response.compressed_pk
   }
@@ -123,7 +191,8 @@ export default class Ledger {
     await this.connect()
 
     const pubKey = await this.getPubKey()
-    return getCosmosAddress(pubKey)
+    const res = await getBech32FromPK(this.hrp, pubKey)
+    return res
   }
 
   // triggers a confirmation request of the cosmos address on the Ledger device
@@ -136,7 +205,7 @@ export default class Ledger {
       return
     }
 
-    const response = await this.cosmosApp.getAddressAndPubKey(HDPATH, BECH32PREFIX)
+    const response = await this.cosmosApp.showAddressAndPubKey(this.hdPath, this.hrp)
     this.checkLedgerErrors(response, {
       rejectionMessage: 'Displayed address was rejected'
     })
@@ -148,7 +217,7 @@ export default class Ledger {
   async sign(signMessage: string) {
     await this.connect()
 
-    const response = await this.cosmosApp.sign(HDPATH, signMessage)
+    const response = await this.cosmosApp.sign(this.hdPath, signMessage)
     this.checkLedgerErrors(response)
     // we have to parse the signature from Ledger as it's in DER format
     const parsedSignature = signatureImport(response.signature)
@@ -187,7 +256,7 @@ export default class Ledger {
         // do nothing
         break
       default:
-        throw new Error(error_message)
+        throw new Error(`Ledger Native Error: ${error_message}`)
     }
   }
 }
@@ -204,4 +273,34 @@ export const checkAppMode = (testModeAllowed: Boolean, testMode: Boolean) => {
       `DANGER: The Cosmos Ledger app is in test mode and shouldn't be used on mainnet!`
     )
   }
+}
+
+// doesn't properly work in ledger-cosmos-js
+function getBech32FromPK(hrp, pk) {
+  if (pk.length !== 33) {
+    throw new Error('expected compressed public key [31 bytes]')
+  }
+  const hashSha256 = crypto
+    .createHash('sha256')
+    .update(pk)
+    .digest()
+  const hashRip = new Ripemd160().update(hashSha256).digest()
+  return bech32.encode(hrp, bech32.toWords(hashRip))
+}
+
+function isWindows(platform) {
+  return platform.indexOf('Win') > -1
+}
+
+function getBrowser(userAgent) {
+  const ua = userAgent.toLowerCase()
+  const isChrome = /chrome|crios/.test(ua) && !/edge|opr\//.test(ua)
+  const isBrave = isChrome && !window.google
+
+  if (!isChrome && !isBrave) {
+    throw new Error("Your browser doesn't support Ledger devices.")
+  }
+
+  if (isBrave) return 'brave'
+  if (isChrome) return 'chrome'
 }

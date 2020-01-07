@@ -46,7 +46,8 @@ const msg = cosmos
 
 // create a signer
 const ledgerSigner = async (signMessage) => {
-  const ledger = await Ledger().connect()
+  const ledger = new Ledger()
+  await ledger.connect()
   const publicKey = await ledger.getPubKey()
   const signature = await ledger.sign(signMessage)
 
@@ -61,4 +62,13 @@ const { included } = await msg.send({ gas: 200000 }, ledgerSigner)
 
 // wait for the transaction to be included in a block
 await included()
+```
+
+### Constructor options
+```
+Ledger(
+  { testModeAllowed = false },
+  hdPath = [44, 118, 0, 0, 0], // HDPATH
+  hrp = 'cosmos', // BECH32PREFIX
+);
 ```

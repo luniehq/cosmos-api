@@ -1,7 +1,26 @@
 import Ledger from '../src/cosmos-ledger'
 
+declare global {
+  interface Navigator {
+    platform: string
+    hid: Object
+    userAgent: string
+  }
+}
+
 jest.mock('secp256k1', () => ({
   signatureImport: () => Buffer.from('1234')
+}))
+
+jest.mock('@ledgerhq/hw-transport-webusb', () => ({
+  default: {
+    create: async () => ({})
+  }
+}))
+jest.mock('@ledgerhq/hw-transport-webhid', () => ({
+  default: {
+    create: async () => ({})
+  }
 }))
 
 const config = {
@@ -12,6 +31,10 @@ describe(`Ledger`, () => {
   let ledger: Ledger
   beforeEach(() => {
     ledger = new Ledger(config)
+
+    // mimic Chrome
+    ledger.userAgent = 'chrome'
+    window.google = {}
   })
 
   it('testDevice', async () => {
@@ -26,17 +49,17 @@ describe(`Ledger`, () => {
     it('connects', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
             }
           }
-          get_version() {
+          getVersion() {
             return {
               major: '1',
               minor: '5',
-              patch: '0',
+              patch: '5',
               test_mode: false,
               error_message: 'No errors'
             }
@@ -47,14 +70,44 @@ describe(`Ledger`, () => {
               error_message: 'No errors'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
+      const Ledger = require('../src/cosmos-ledger').default
       ledger = new Ledger(config)
+      ledger.userAgent = 'chrome'
       await ledger.connect()
+    })
+
+    it(`uses WebHID on Windows`, async () => {
+      jest.resetModules()
+      jest.doMock('@ledgerhq/hw-transport-webhid', () => ({
+        default: {
+          create: jest.fn()
+        }
+      }))
+      const TransportWebHID = require('@ledgerhq/hw-transport-webhid')
+      const Ledger = require('../src/cosmos-ledger').default
+
+      ledger = new Ledger(config)
+      window.navigator.hid = { enabled: true }
+      ledger.platform = 'Windows'
+      ledger.userAgent = 'chrome'
+      await ledger.connect()
+
+      expect(TransportWebHID.default.create).toHaveBeenCalled()
+    })
+
+    it(`fails if trying to use the lib on a browser that doesn't support Ledgers`, async () => {
+      ledger.userAgent = 'ie'
+      await expect(ledger.connect()).rejects.toThrowError(
+        "Your browser doesn't support Ledger devices."
+      )
+    })
+
+    it(`works on Brave`, async () => {
+      ledger.userAgent = 'chrome'
+      window.google = undefined
+      await expect(ledger.connect()).resolves
     })
 
     it('uses existing connection', async () => {
@@ -72,19 +125,17 @@ describe(`Ledger`, () => {
     it("fails if can't get data from device", async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
-          publicKey() {
+        default: class MockApp {
+          getVersion() {
             return {
               error_message: 'BIG ERROR'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow('BIG ERROR')
     })
@@ -92,13 +143,13 @@ describe(`Ledger`, () => {
     it('fails if Cosmos App is outdated', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors'
             }
           }
-          get_version() {
+          getVersion() {
             return {
               major: '1',
               minor: '0',
@@ -107,13 +158,11 @@ describe(`Ledger`, () => {
               error_message: 'No errors'
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow(
         'Outdated version: Please update Ledger Cosmos App to the latest version.'
@@ -123,20 +172,18 @@ describe(`Ledger`, () => {
     it('fails if Ledger device is locked', async () => {
       jest.resetModules()
       jest.doMock('ledger-cosmos-js', () => ({
-        App: class MockApp {
+        default: class MockApp {
           publicKey() {
             return {
               error_message: 'No errors',
               device_locked: true
             }
           }
-        },
-        comm_u2f: {
-          create_async: () => ({})
         }
       }))
-      const Ledger = require('../src/ledger').default
-      ledger = new Ledger(config)
+      const Ledger = require('../src/cosmos-ledger')
+      ledger = new Ledger.default(config)
+      ledger.userAgent = 'chrome'
 
       await expect(ledger.connect()).rejects.toThrow('')
     })
@@ -147,7 +194,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '5',
             patch: '0',
@@ -166,7 +213,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '1',
             patch: '0',
@@ -185,7 +232,7 @@ describe(`Ledger`, () => {
       const self = {
         connect: jest.fn(),
         cosmosApp: {
-          get_version: () => ({
+          getVersion: () => ({
             major: '1',
             minor: '5',
             patch: '0',
@@ -211,7 +258,8 @@ describe(`Ledger`, () => {
             error_message: 'No errors'
           })
         },
-        checkLedgerErrors: jest.fn()
+        checkLedgerErrors: jest.fn(),
+        getOpenApp: ledger.getOpenApp
       }
       await ledger.isCosmosAppOpen.call(self)
       expect(self.connect).toHaveBeenCalled()
@@ -227,7 +275,8 @@ describe(`Ledger`, () => {
             error_message: 'No errors'
           })
         },
-        checkLedgerErrors: jest.fn()
+        checkLedgerErrors: jest.fn(),
+        getOpenApp: ledger.getOpenApp
       }
       await expect(ledger.isCosmosAppOpen.call(self)).rejects.toThrow()
       expect(self.connect).toHaveBeenCalled()
@@ -238,11 +287,14 @@ describe(`Ledger`, () => {
   it('getCosmosAddress', async () => {
     const self = {
       connect: jest.fn(),
-      getPubKey: jest.fn(() => Buffer.from('1234'))
+      hrp: 'cosmos',
+      getPubKey: jest.fn(() =>
+        Buffer.from('52FDFC072182654F163F5F0F9A621D729566C74D10037C4D7BBB0407D1E2C64981', 'hex')
+      )
     }
     const res = await ledger.getCosmosAddress.call(self)
     expect(self.connect).toHaveBeenCalled()
-    expect(res).toBe('cosmos1l4aqmqyen0kawmy6pq5q27qhl3synfg8uqcsa5')
+    expect(res).toBe('cosmos1v3z3242hq7xrms35gu722v4nt8uux8nvug5gye')
   })
 
   it('getPubKey', async () => {
@@ -267,9 +319,9 @@ describe(`Ledger`, () => {
       const self = {
         checkLedgerErrors: jest.fn(),
         connect: jest.fn(),
-        getCosmosAppVersion: () => '1.5.0',
+        getCosmosAppVersion: () => '1.5.5',
         cosmosApp: {
-          getAddressAndPubKey: jest.fn(() => ({
+          showAddressAndPubKey: jest.fn(() => ({
             error_message: 'No errors'
           }))
         }
@@ -277,7 +329,7 @@ describe(`Ledger`, () => {
       await ledger.confirmLedgerAddress.call(self)
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).toHaveBeenCalled()
-      expect(self.cosmosApp.getAddressAndPubKey).toHaveBeenCalled()
+      expect(self.cosmosApp.showAddressAndPubKey).toHaveBeenCalled()
     })
 
     it('old version', async () => {
@@ -286,7 +338,7 @@ describe(`Ledger`, () => {
         connect: jest.fn(),
         getCosmosAppVersion: () => '1.1.0',
         cosmosApp: {
-          getAddressAndPubKey: jest.fn(() => ({
+          showAddressAndPubKey: jest.fn(() => ({
             error_message: 'No errors'
           }))
         }
@@ -294,7 +346,7 @@ describe(`Ledger`, () => {
       await ledger.confirmLedgerAddress.call(self)
       expect(self.connect).toHaveBeenCalled()
       expect(self.checkLedgerErrors).not.toHaveBeenCalled()
-      expect(self.cosmosApp.getAddressAndPubKey).not.toHaveBeenCalled()
+      expect(self.cosmosApp.showAddressAndPubKey).not.toHaveBeenCalled()
     })
   })
 
@@ -308,7 +360,8 @@ describe(`Ledger`, () => {
           signature: Buffer.from('1234'), // needs to be a DER signature, but the upstream library is mockeed here
           error_message: 'No errors'
         }))
-      }
+      },
+      hdPath: [44, 118, 0, 0, 0]
     }
     const res = await ledger.sign.call(self, 'message')
     expect(self.connect).toHaveBeenCalled()

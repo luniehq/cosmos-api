@@ -7,7 +7,63 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
-## [0.0.5] - 2019-06-12
+## [0.1.5] - 2020-01-07
+
+### Fixed
+
+- reenable confirmLedgerAddress @faboweb
+
+## [0.1.4] - 2019-12-07
+
+### Added
+
+- Handle outdated browser error @faboweb
+
+### Fixed
+
+- Show correct feature flag URL for HID support @faboweb
+
+## [0.1.3] - 2019-12-04
+
+### Changed
+
+- Handle the case were the Ledger is already used by another tab @faboweb
+
+## [0.1.2] - 2019-12-04
+
+### Fixed
+
+- Reduce requirement to app version 1.5.3 @faboweb
+
+## [0.1.1] - 2019-12-04
+
+### Fixed
+
+- Removes webpack as it didn't work properly with lazy loading dependencies @faboweb
+
+## [0.1.0] - 2019-12-04
+
+### Changed
+
+- [#13](https://github.com/cosmos/lunie/pull/13) Switched to WebHID on Windows and WebUSB on OSX/Linux @faboweb
+
+## [0.0.7] - 2019-11-28
+
+### Changed
+
+- Support new Cosmos App v2 @faboweb
+
+### Repository
+
+- Updated ledger cosmos js dependency @faboweb
+
+
+## [0.0.6] - 2019-10-07
+
+
+### Repository
+
+- Reduced size of library @williamchong007
 
 ### Fixed
 
