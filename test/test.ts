@@ -321,7 +321,7 @@ describe(`Ledger`, () => {
         connect: jest.fn(),
         getCosmosAppVersion: () => '1.5.5',
         cosmosApp: {
-          getAddressAndPubKey: jest.fn(() => ({
+          showAddressAndPubKey: jest.fn(() => ({
             error_message: 'No errors'
           }))
         }
