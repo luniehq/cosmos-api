@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 <!-- SIMSALA --> <!-- DON'T DELETE, used for automatic changelog updates -->
 
+## [0.1.5] - 2020-01-07
+
+### Fixed
+
+- reenable confirmLedgerAddress @faboweb
+
 ## [0.1.4] - 2019-12-07
 
 ### Added
