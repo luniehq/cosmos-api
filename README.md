@@ -1,12 +1,12 @@
-# Cosmos Ledger App wrapper
+# Cosmos Ledger
 
-This library helps interfacing with Cosmos Ledger App. It provides a developer friendly interface and user friendly error messages.
+Cosmos Ledger is a library for interacting with the Cosmos Ledger Nano App. It provides a developer-friendly interface and user friendly error messages for an improved Ledger Nano development experience.
 
-## THANK YOU
+This library is based on [ledger-cosmos-js](https://github.com/ZondaX/ledger-cosmos-js) by [Juan Leni](https://github.com/jleni) who also implemented the [official Cosmos Ledger Nano App](https://github.com/cosmos/ledger-cosmos). 
 
-This library is based on `ledger-cosmos-js` by Juan Leni who implemente the Cosmos Ledger App. Thank you Juan!
+*Thank you Juan!* 🙌
 
-## Install
+## Installation
 
 ```bash
 yarn add @lunie/cosmos-ledger
@@ -14,37 +14,37 @@ yarn add @lunie/cosmos-ledger
 
 ## Usage
 
-### Sign using the Ledger
+### Signing with the Ledger Nano
 
 ```js
 import Ledger from "@lunie/cosmos-ledger"
 
-const signMessage = ... message to sign, generate messages with "@lunie/cosmos-js"
-
-const ledger = new Ledger()
-
-await ledger.connect()
-
+// generate messages with "@lunie/cosmos-api"
+const signMessage = {} || ``
+const ledger = await Ledger().connect()
 const signature = await ledger.sign(signMessage)
 ```
 
-### Using with cosmos-js
+### Using with cosmos-api
 
 ```js
 import Ledger from "@lunie/cosmos-ledger"
-import Cosmos from "@lunie/cosmos-js"
+import Cosmos from "@lunie/cosmos-api"
 
 const privateKey = Buffer.from(...)
 const publicKey = Buffer.from(...)
 
-// init cosmos sender
-const cosmos = Cosmos(STARGATE_URL, ADDRESS)
+// init cosmos API object
+const cosmos = Cosmos(API_URL, ADDRESS)
 
-// create message
+// create a message
 const msg = cosmos
-  .MsgSend({toAddress: 'cosmos1abcd09876', amounts: [{ denom: 'stake', amount: 10 }})
+  .MsgSend({
+    toAddress: 'cosmos1abcd09876', 
+    amounts: [{ denom: 'stake', amount: 10 }]
+  })
 
-// create a signer from this local js signer library
+// create a signer
 const ledgerSigner = async (signMessage) => {
   const ledger = new Ledger()
   await ledger.connect()
@@ -58,9 +58,9 @@ const ledgerSigner = async (signMessage) => {
 }
 
 // send the transaction
-const { included }= await msg.send({ gas: 200000 }, ledgerSigner)
+const { included } = await msg.send({ gas: 200000 }, ledgerSigner)
 
-// await tx to be included in a block
+// wait for the transaction to be included in a block
 await included()
 ```
 
