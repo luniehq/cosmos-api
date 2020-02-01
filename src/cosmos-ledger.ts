@@ -127,6 +127,9 @@ export default class Ledger {
             "You did not select a Ledger device. If you didn't see your Ledger, check if the Ledger is plugged in and unlocked."
           )
         }
+
+        // throw unknown error
+        throw err
       }
     }
 
