@@ -83,7 +83,7 @@
     "@types/semver": "^6.0.0",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
-    "husky": "^1.0.1",
+    "husky": "^4.2.5",
     "jest": "^24.9.0",
     "jest-config": "^24.9.0",
     "lint-staged": "^8.0.0",
