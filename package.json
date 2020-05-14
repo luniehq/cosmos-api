@@ -103,6 +103,6 @@
     "@ledgerhq/hw-transport-webusb": "^5.7.0",
     "ledger-cosmos-js": "^2.1.7",
     "secp256k1": "^3.7.0",
-    "semver": "^6.1.0"
+    "semver": "^7.3.2"
   }
 }
