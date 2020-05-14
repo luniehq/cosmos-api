@@ -82,7 +82,7 @@
     "@types/secp256k1": "^3.5.0",
     "@types/semver": "^6.0.0",
     "coveralls": "^3.0.2",
-    "cross-env": "^5.2.0",
+    "cross-env": "^7.0.2",
     "husky": "^4.2.5",
     "jest": "^24.9.0",
     "jest-config": "^26.0.1",
