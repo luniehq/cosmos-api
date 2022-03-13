@@ -4,7 +4,7 @@ Cosmos API is a library for interacting with applications built on the Cosmos SD
 ## Install
 
 ```bash
-yarn add @lunie/cosmos-js
+yarn add @lunie/cosmos-api
 ```
 
 ## Use
@@ -12,7 +12,7 @@ yarn add @lunie/cosmos-js
 Simple example of how to send tokens.
 
 ```javascript
-import Cosmos from "@lunie/cosmos-js"
+import Cosmos from "@lunie/cosmos-api"
 
 const STARGATE_URL = "https://stargate.cosmos.network"
 const ADDRESS = "cosmos1abcd1234"
@@ -40,7 +40,7 @@ await included()
 If you want to query data only, you don't need to specify an address.
 
 ```javascript
-import { API } from "@lunie/cosmos-js"
+import { API } from "@lunie/cosmos-api"
 
 const STARGATE_URL = "https://stargate.cosmos.network"
 
